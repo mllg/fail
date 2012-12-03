@@ -10,7 +10,7 @@ A FAL is constructed on a single directory and provides convenient functionallit
 * Create, load, save and remove R object using a key-value syntax.
 * Effiently apply functions on all files or on subsets.
 * Flexible in-memory caching mechanism to avoid reading files multiple times.
-* Choose and mix between the closure interface (`results$as.list()`, `results$list()`) and a list-like interface (`as.list(results)`, `names(results)`).
+* Choose and mix between the closure interface (`results$get("a")`, `results$as.list()`, `results$ls()`) and a list-like interface (`results[["a"]]`, `as.list(results)`, `names(results)`).
   The latter can be turned off.
 
 

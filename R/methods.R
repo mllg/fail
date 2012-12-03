@@ -9,7 +9,7 @@ print.fal = function(x, ...) {
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
       sprintf("  %-9s : %s", "functions", collapse(x$funs(), ", ")),
-      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class="fal")), ", ")), #FIXME class rigth?
+      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class=class(x)[1L])), ", ")),
       sep = "\n")
 }
 

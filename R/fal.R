@@ -1,3 +1,8 @@
+### TODO
+# remove checkKeysExist and rethink argument checks
+# fix test errors introduced by NULL returns if_key_not_found
+
+
 #' Create a file abstraction layer.
 #'
 #' @param path [\code{character(1)}]\cr
@@ -100,7 +105,6 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
     get = function(key, cache = .opts$cache) {
       checkString(key)
-      checkKeysExist(key, key.exists(key))
       Get(key, isTRUE(cache))
     },
 
@@ -123,8 +127,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
     remove = function(keys) {
       checkStrings(keys)
-      checkKeysExist(keys, key.exists(keys))
-      checkKeysDuplicated(keys)
+      keys = unique(keys[key.exists(keys)])
       fns = key2fn(keys)
       ok = file.remove(fns)
       if (!all(ok))
@@ -149,7 +152,6 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
         keys = Ls()
       } else {
         checkStrings(keys, min.len=0L)
-        checkKeysExist(keys, key.exists(keys))
       }
 
       wrapper = function(key, cache, ...) {
@@ -180,7 +182,6 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
         keys = Ls()
       } else {
         checkStrings(keys, min.len=0L)
-        checkKeysExist(keys, key.exists(keys))
       }
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
     },

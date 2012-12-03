@@ -43,21 +43,6 @@ argsAsNamedList = function(...) {
   setNames(args, ns)
 }
 
-# allEqual = function(x, check.names = FALSE, tol = .Machine$double.eps^0.5) {
-#   n.nas = sum(is.na(x))
-#   if (n.nas > 0L && n.nas < length(x))
-#     return(FALSE)
-#
-#   if (is.double(x) && tol > 0) {
-#     equal = all(abs(head(x, 1L) - tail(x, -1L)) < tol)
-#   } else if(is.logical(x)) {
-#     equal = all(x)
-#   } else {
-#     equal == all(head(x, 1L) == tail(x, -1L))
-#   }
-#   equal && (!isTRUE(check.names) || allEqual(names(x), check.names=FALSE))
-# }
-#
 simpleLoad = function(fn) {
   if (!file.exists(fn))
     return(NULL)

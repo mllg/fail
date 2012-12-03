@@ -16,7 +16,6 @@ test_that("remove", {
   expect_warning(f$remove("c"), "No such file")
   expect_equal(suppressWarnings(f$remove("c")), setNames(FALSE, "c"))
   expect_error(f$remove())
-  expect_error(f$remove(character(0L)))
 
   # cache
   expect_equal(f$get("a", cache=TRUE), 1)

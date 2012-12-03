@@ -2,7 +2,7 @@ context("remove and clear")
 
 test_that("remove", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   f$put(a = 1, b = 2)
   expect_equal(f$remove("b"), setNames(TRUE, "b"))
@@ -33,7 +33,7 @@ test_that("remove", {
 
 test_that("clear", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
   f$put(a = 1, b = 2)
   f$get("a", cache=TRUE)
   f$get("b", cache=TRUE)

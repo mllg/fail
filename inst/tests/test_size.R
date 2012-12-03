@@ -3,7 +3,7 @@ context("size")
 
 test_that("size", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   expect_equal(length(f$size()), 0)
   f$put(a = 1, b = 2, c = 3)

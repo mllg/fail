@@ -1,3 +1,3 @@
 library(testthat)
-library(fal)
-test_package("fal")
+library(fail)
+test_package("fail")

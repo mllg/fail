@@ -3,18 +3,28 @@
 File Abstraction Layer (FAL) for R mimicking a key-value store.
 
 This package simplifies working with RData files managed in directories.
-A FAL is constructed on a single directory and provides convenient functionallity:
+A FAL is constructed on a single directory and provides convenient functionality:
  
 * Internal handling of path joining.
 * List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression.
 * Create, load, save and remove R object using a key-value syntax.
-* Effiently apply functions on all files or on subsets.
+* Efferently apply functions on all files or on subsets.
 * Flexible in-memory caching mechanism to avoid reading files multiple times.
 * Choose and mix between the closure interface (`results$get("a")`, `results$as.list()`, `results$ls()`) and a list-like interface (`results[["a"]]`, `as.list(results)`, `names(results)`).
   The latter can be turned off.
 
+## Installation
+
+Install from GitHub using the `devtools` package:
+```splus
+library(devtools)
+install_github("fal", username="mllg")
+library(fal)
+```
 
 ## Usage
+
+### Example files
 
 For illustration assume we have a directory with multiple (result) files in it. You can create one in your current working directory by using this snippet:
 
@@ -33,13 +43,17 @@ list.files(path)
 ### Initialization
 
 ```splus
+# install dependencies from CRAN
+install.packages("BBmisc")
+
 # install package from github using devtools
 library(devtools)
 install_github("fal", username="mllg")
 
-# load package
+# load the package
 library(fal)
 
+# initialize a FAL on the previously created directory
 results = fal("results")
 print(results)
 ```
@@ -47,69 +61,82 @@ print(results)
 ### Listing files
 
 ```splus
-# use
+### list files
+# closure interface
 results$ls()
-# -or-
+# list-like interface
 names(results)
 
-# get subsets using a regular expression
+### get subsets using a regular expression
+# closure interface
 results$ls("result_a")
-results$ls("_01")
+# list-like interface 
+subset(names(results), grepl("result_a", names(results)))
 ```
 
 ### Loading R objects
 
 ```splus
-# single objects
+### single objects
+# closure interface
 results$get("result_a_01")
+# list-like interface 
 results[["result_a_01"]]
 
-# multiple objects
+### multiple objects
 keys = results$ls("a") 
+# closure interface
 results$as.list(keys)
+# list-like interface 
 results[keys]
-as.list(results, keys)
 
-# all objects
+### all objects
+# closure interface
 results$as.list()
-results[]
-as.list(results)
+# list-like interface 
+as.list(results) 
+results[] 
 ```
 
 ### Saving R objects
 
 ```splus
-# files will be named "foo.RData" and "bar.RData"
-results$put(foo = 1, bar = 101)
-results$put(li = list(foo = 2, bar = 102))
-results[["foo"]] = 3
-results[c("foo", "bar")] = c(4, 102)
+### new files will be named "foo.RData" and "bar.RData"
+# closure interface
+results$put(foo = 1, bar = 2)
+results$put(li = list(foo = 1, bar = 2))
+# list-like interface
+results[["foo"]] = 1
+results[c("foo", "bar")] = 1:2
 ```
 
 ### Removing R objects (and corresponding files)
 
 ```splus
+# closure interface
 results$remove("foo")
-results[["bar"]] = NULL
 results$remove(results$ls("result_j"))
+# list-like interface
+results[["bar"]] = NULL
+keys = names(results)
+results[keys[grepl("result_j", keys)]] = NULL
 ```
 
 ### Applying functions over R objects
 
 ```splus
-# memory-inefficent (list with all items will first be build)
-sapply(results$as.list(), mean)
-sapply(as.list(results), mean)
-
-# specialized iterative version
-results$apply(mean)
+# closure interface, memory optimized
 results$apply(mean, keys=results$ls("_a_"), simplify=TRUE)
+
+# list-like interface
+keys = names(results)
+sapply(as.list(results), mean, keys[grepl("_a_", keys)], simplify=TRUE)
 ```
 
-### Other utility functions
+### More utility functions
 
 ```splus
-# useful to considering if loading all files at once is possible
+# show file size informations
 results$size(unit="Kb")
 
 # use caching mechanism (can be enabled globally)

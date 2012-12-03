@@ -1,8 +1,3 @@
-### TODO
-# remove checkKeysExist and rethink argument checks
-# fix test errors introduced by NULL returns if_key_not_found
-
-
 #' Create a file abstraction layer.
 #'
 #' @param path [\code{character(1)}]\cr
@@ -18,9 +13,9 @@
 #' @param list.interface [\code{logical(1)}]\cr
 #'   Enable S3 methods to enable an interface similar to lists?
 #'   Default is \code{TRUE}.
-#' @return Object of class \code{fal}. See Details.
+#' @return Object of class \code{fail}. See Details.
 #' @export
-fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, list.interface=TRUE) {
+fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, list.interface=TRUE) {
   # Internal functions frequently used, w/o argument checks
   key2fn = function(key) {
     file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
@@ -39,6 +34,8 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
   Get = function(key, cache = .opts$cache) {
     fn = key2fn(key)
+    if (!file.exists(fn))
+      return(NULL)
     if (!cache)
       return(simpleLoad(fn))
 
@@ -51,12 +48,11 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
     if (!length(x))
       return(invisible(character(0L)))
     keys = names(x)
-    # FIXME cache
-    fns = key2fn(keys)
-    x = list2env(x, parent=emptyenv())
-    for (i in seq_along(keys))
-      save(list = keys[i], file = fns[i], envir = x)
-    keys
+
+    if (cache)
+      mapply(.cache$put, key=keys, value=x, USE.NAMES=FALSE, SIMPLIFY=FALSE)
+
+    invisible(mapply(simpleSave, fn=key2fn(keys), key=keys, value=x, USE.NAMES=FALSE))
   }
 
   # Argument checking and initilization
@@ -126,7 +122,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
     },
 
     remove = function(keys) {
-      checkStrings(keys)
+      checkStrings(keys, min.len=0L)
       keys = unique(keys)
       fns = key2fn(keys)
       ok = file.remove(fns)
@@ -148,11 +144,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
     apply = function(FUN, ..., keys, cache=.opts$cache, simplify=FALSE, use.names=TRUE) {
       FUN = match.fun(FUN)
-      if (missing(keys)) {
-        keys = Ls()
-      } else {
-        checkStrings(keys, min.len=0L)
-      }
+      if (missing(keys)) keys = Ls() else checkStrings(keys, min.len=0L)
 
       wrapper = function(key, cache, ...) {
         res = try(FUN(Get(key, cache=cache), ...), silent=TRUE)
@@ -165,12 +157,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
     },
 
     size = function(keys, unit="b") {
-      if (missing(keys)) {
-        keys = Ls()
-      } else {
-        checkStrings(keys)
-        checkKeysExist(keys, key.exists(keys))
-      }
+      if (missing(keys)) keys = Ls() else checkStrings(keys)
       match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
 
       size = as.integer(file.info(key2fn(keys))$size)
@@ -192,5 +179,5 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
     cached = function() {
       .cache$keys()
-    }), if (isTRUE(list.interface)) c("fal_list", "fal") else "fal")
+    }), if (isTRUE(list.interface)) c("fail_list", "fail") else "fail")
 }

@@ -2,7 +2,7 @@ context("list, get, put")
 
 test_that("list, get, put", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   expect_equal(f$ls(), character(0L))
   expect_equal(f$put(a = 1, b = 2), letters[1:2])

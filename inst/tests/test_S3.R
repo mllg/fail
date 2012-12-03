@@ -2,7 +2,7 @@ context("S3")
 
 test_that("single", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   f["a"] = 1
   expect_equal(f$ls(), "a")
@@ -13,7 +13,7 @@ test_that("single", {
 
 test_that("double", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   f[["a"]] = 1
   expect_equal(names(f), "a")

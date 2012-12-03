@@ -14,11 +14,6 @@ checkKeysFormat = function(keys) {
     stopf("Illegal format for keys: '%s'", collapse(keys[!ok]))
 }
 
-checkKeysExist = function(keys, existing) {
-  if (!all(existing))
-    stopf("File for key '%s' not found", head(keys[!existing], 1L))
-}
-
 checkKeysDuplicated = function(keys) {
   ok = anyDuplicated(keys)
   if (ok > 0L)
@@ -44,8 +39,6 @@ argsAsNamedList = function(...) {
 }
 
 simpleLoad = function(fn) {
-  if (!file.exists(fn))
-    return(NULL)
   ee = new.env(parent=emptyenv())
   ns = load(fn, envir=ee)
   if (length(ns) == 1L) {
@@ -53,6 +46,13 @@ simpleLoad = function(fn) {
   } else {
     as.list(ee)
   }
+}
+
+simpleSave = function(fn, key, value) {
+  ee = new.env(parent=emptyenv(), hash=FALSE)
+  assign(key, value, envir=ee)
+  save(list=key, envir=ee, file=fn)
+  key
 }
 
 checkCollision = function(new, existing, overwrite) {

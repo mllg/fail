@@ -1,39 +1,40 @@
-#' @method print fal
-#' @S3method print fal
-print.fal = function(x, ...) {
+#' @method print fail
+#' @S3method print fail
+print.fail = function(x, ...) {
   opts = environment(x$ls)$.opts
-  cat(sprintf("Key-value store on directory '%s':", opts$path),
+  cat(sprintf("File Abstraction Interface layer on directory '%s':", opts$path),
       sprintf("  %-9s : %i", "items", length(x$ls())),
       sprintf("  %-9s : %i", "cached", length(x$cached())),
       sprintf("  %-9s : .%s", "extension", opts$extension),
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
       sprintf("  %-9s : %s", "functions", collapse(x$funs(), ", ")),
-      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class=class(x)[1L])), ", ")),
+      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fail$", "", methods(class=class(x)[1L])), ", ")),
       sep = "\n")
 }
 
-#' @method names fal_list
-#' @S3method names fal_list
-names.fal_list = function(x) {
+#' @method names fail_list
+#' @S3method names fail_list
+names.fail_list = function(x) {
+  #FIXME add pattern?
   x$ls()
 }
 
-#' @method as.list fal_list
-#' @S3method as.list fal_list
-as.list.fal_list = function(x, ...) {
+#' @method as.list fail_list
+#' @S3method as.list fail_list
+as.list.fail_list = function(x, ...) {
   x$as.list(...)
 }
 
-#' @method [[ fal_list
-#' @S3method [[ fal_list
-`[[.fal_list` = function(x, key) {
+#' @method [[ fail_list
+#' @S3method [[ fail_list
+`[[.fail_list` = function(x, key) {
   x$get(key)
 }
 
-#' @method [[<- fal_list
-#' @S3method [[<- fal_list
-`[[<-.fal_list` = function(x, key, value) {
+#' @method [[<- fail_list
+#' @S3method [[<- fail_list
+`[[<-.fail_list` = function(x, key, value) {
   if (length(key) > 1L)
     stopf("subscript out of bounds")
   if (is.null(value))
@@ -43,17 +44,19 @@ as.list.fal_list = function(x, ...) {
   invisible(x)
 }
 
-#' @method [ fal_list
-#' @S3method [ fal_list
-`[.fal_list` = function(x, keys) {
+#' @method [ fail_list
+#' @S3method [ fail_list
+`[.fail_list` = function(x, keys) {
   x$as.list(keys)
 }
 
-#' @method [<- fal_list
-#' @S3method [<- fal_list
-`[<-.fal_list` = function(x, keys, value) {
+#' @method [<- fail_list
+#' @S3method [<- fail_list
+`[<-.fail_list` = function(x, keys, value) {
   if (length(keys) != length(value))
     stop("Length mismatch")
-  x$put(li = as.list(setNames(value, keys)))
+  isnull = vapply(value, is.null, TRUE)
+  x$remove(keys[isnull])
+  x$put(li = as.list(setNames(value[!isnull], keys[!isnull])))
   invisible(x)
 }

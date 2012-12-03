@@ -1,8 +1,8 @@
-\name{fal}
-\alias{fal}
+\name{fail}
+\alias{fail}
 \title{Create a file abstraction layer.}
 \usage{
-  fal(path = getwd(), extension = "RData", cache = FALSE,
+  fail(path = getwd(), extension = "RData", cache = FALSE,
     overwrite = TRUE, list.interface = TRUE)
 }
 \arguments{
@@ -25,7 +25,7 @@
   is \code{TRUE}.}
 }
 \value{
-  Object of class \code{fal}. See Details.
+  Object of class \code{fail}. See Details.
 }
 \description{
   Create a file abstraction layer.

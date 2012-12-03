@@ -3,7 +3,7 @@ context("as.list")
 
 test_that("as.list", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   f$put(a = 1, b = 2, c = 3)
   expect_equal(f$as.list(), setNames(as.list(1:3), letters[1:3]))

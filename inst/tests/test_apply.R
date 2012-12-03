@@ -3,7 +3,7 @@ context("apply")
 
 test_that("apply", {
   path = tempfile()
-  f = fal(path)
+  f = fail(path)
 
   f$put(a = 1:10, b = 1:100, c = 1:1000)
   x = f$apply(mean)

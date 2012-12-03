@@ -10,8 +10,7 @@ A FAIL is constructed on a single directory and provides convenient functionalit
 * Create, load, save and remove R object using a key-value syntax.
 * Efferently apply functions on all files or on subsets.
 * Flexible in-memory caching mechanism to avoid reading files multiple times.
-* Choose and mix between the closure interface (`results$get("a")`, `results$as.list()`, `results$ls()`) and a list-like interface (`results[["a"]]`, `as.list(results)`, `names(results)`).
-  The latter can be turned off.
+
 
 ## Installation
 
@@ -26,7 +25,7 @@ library(fail)
 
 ### Example files
 
-For illustration assume we have a directory with multiple (result) files in it. You can create one in your current working directory by using this snippet:
+For illustration assume we have a directory with multiple (result) files in it. You can create one in your current working directory by using this small snippet:
 
 ```splus
 path = file.path(getwd(), "results")
@@ -51,76 +50,52 @@ print(results)
 ### Listing files
 
 ```splus
-### list files
-# closure interface
+# get all keys for previously defined (and internally stored) directory
 results$ls()
-# list-like interface
-names(results)
 
-### get subsets using a regular expression
-# closure interface
-results$ls("result_a")
-# list-like interface 
-subset(names(results), grepl("result_a", names(results)))
+# restrict to  subsets using a regular expression
+results$ls("^result_a")
 ```
 
 ### Loading R objects
 
 ```splus
-### single objects
-# closure interface
-results$get("result_a_01")
-# list-like interface 
-results[["result_a_01"]]
+# single object
+results$get("_a_")
 
-### multiple objects
-keys = results$ls("a") 
-# closure interface
+# multiple objects
+keys = results$ls("_a_") 
 results$as.list(keys)
-# list-like interface 
-results[keys]
 
-### all objects
-# closure interface
-results$as.list()
-# list-like interface 
-as.list(results) 
-results[] 
+# all objects
+results$as.list() # or as.list(results)
 ```
 
 ### Saving R objects
 
 ```splus
-### new files will be named "foo.RData" and "bar.RData"
-# closure interface
+# add two files "foo.RData" and "bar.RData"
 results$put(foo = 1, bar = 2)
+
+# you can also provide a named list, each item will be saved in a separate file
 results$put(li = list(foo = 1, bar = 2))
-# list-like interface
-results[["foo"]] = 1
-results[c("foo", "bar")] = 1:2
 ```
 
-### Removing R objects (and corresponding files)
+### Removing R objects (and related files)
 
 ```splus
-# closure interface
 results$remove("foo")
-results$remove(results$ls("result_j"))
-# list-like interface
-results[["bar"]] = NULL
-keys = names(results)
-results[keys[grepl("result_j", keys)]] = NULL
+results$remove(results.ls("ar"))
 ```
 
 ### Applying functions over R objects
 
 ```splus
-# closure interface, memory optimized
+# memory optimized lapply-like function
 results$apply(mean, keys=results$ls("_a_"), simplify=TRUE)
 
-# list-like interface
-keys = names(results)
-sapply(as.list(results), mean, keys[grepl("_a_", keys)], simplify=TRUE)
+# the same, but the list of all files will be created first
+sapply(as.list(results), mean)
 ```
 
 ### More utility functions
@@ -129,7 +104,7 @@ sapply(as.list(results), mean, keys[grepl("_a_", keys)], simplify=TRUE)
 # show file size informations
 results$size(unit="Kb")
 
-# use caching mechanism (can be enabled globally)
+# enable caching (can be switched on globally)
 library(microbenchmark)
 results$put(a = rnorm(100000))
 microbenchmark(results$get("a"), results$get("a", cache=TRUE))

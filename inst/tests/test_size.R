@@ -12,4 +12,6 @@ test_that("size", {
   expect_true(is.numeric(f$size()))
 
   expect_true(all(f$size() > f$size(unit="Mb")))
+  expect_true(unname(is.na(f$size("d"))))
+  expect_equal(f$size(character(0L)), setNames(numeric(0L), character(0L)))
 })

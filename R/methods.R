@@ -8,13 +8,13 @@ print.fail = function(x, ...) {
       sprintf("  %-9s : .%s", "extension", opts$extension),
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
-      sprintf("  %-9s : %s", "functions", collapse(x$funs(), ", ")),
-      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fail$", "", methods(class=class(x)[1L])), ", ")),
+      sprintf("  %-9s : %s", "functions", collapse(names(x), ", ")),
+      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fail$", "", methods(class="fail")), ", ")),
       sep = "\n")
 }
 
-#' @method as.list fail_list
-#' @S3method as.list fail_list
+#' @method as.list fail
+#' @S3method as.list fail
 as.list.fail = function(x) {
   x$as.list()
 }

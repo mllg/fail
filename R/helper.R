@@ -1,3 +1,20 @@
+as.flag = function(x) {
+  if (missing(x))
+    stopf("Argument %s is missing", deparse(substitute(x)))
+  if (length(x) != 1L)
+    stopf("Argument %s must have length 1", deparse(substitute(x)))
+  if (is.logical(x)) {
+    if (is.na(x))
+      stopf("Argument %s may not be NA", deparse(substitute(x)))
+    return(x)
+  }
+  conv = try(as.logical(x), silent=TRUE)
+  if (is.error(conv) || length(conv) != 1L || is.na(conv))
+    stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
+  return(conv)
+}
+
+
 checkString = function(x, na.ok=FALSE) {
   if (missing(x) || !is.character(x) || length(x) != 1L || (!na.ok && is.na(x)))
     stopf("Argument '%s' must be a character vector of length 1", deparse(substitute(x)))

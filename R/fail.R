@@ -17,13 +17,12 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   key2fn = function(key) {
     file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
   }
-  key.exists = function(key) {
-    file.exists(key2fn(key))
+  fn2key = function(fn) {
+    sub(sprintf("\\.%s$", .opts$extension), "", fn)
   }
 
   Ls = function(pattern=NULL) {
-    fns = list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension))
-    keys = sub(sprintf("\\.%s$", .opts$extension), "", fns)
+    keys = fn2key(list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension)))
     if (!is.null(pattern))
       keys = keys[grepl(pattern, keys)]
     keys
@@ -32,10 +31,9 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   Get = function(key, cache = .opts$cache) {
     fn = key2fn(key)
     if (!file.exists(fn))
-      return(NULL)
+      stopf("File for key '%s' not found", key)
     if (!cache)
       return(simpleLoad(fn))
-
     if (key %nin% .cache$keys())
       .cache$put(key, simpleLoad(fn))
     .cache$get(key)
@@ -59,20 +57,10 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   if (file.exists(path)) {
     if (!file_test("-d", path))
       stopf("Path '%s' is present but not a directory", path)
-    if (file.access(path, mode=4L) != 0L)
+    if (file.access(path, mode = 4L) != 0L)
       stopf("Path '%s' is not readable", path)
-    if (file.access(path, mode=2L) != 0L)
+    if (file.access(path, mode = 2L) != 0L)
       stopf("Path '%s' is not writeable", path)
-
-    # some sanity checks
-    local({
-      fns = list.files(path, pattern=sprintf("\\.%s$", extension))
-      keys = sub(sprintf("\\.%s$", extension), "", fns)
-      checkKeysFormat(keys)
-      dup = anyDuplicated(tolower(keys))
-      if (dup > 0L)
-        warningf("Some files would collide on case insensitve file names, e.g. '%s'", fns[dup])
-    })
   } else {
     if (!dir.create(path))
       stopf("Could not create directory '%s'", path)
@@ -83,11 +71,16 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
          collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
 
   # set up list of options and remove obsolete vars
-  .opts = list(path = normalizePath(path), extension=extension, cache=isTRUE(cache), overwrite=isTRUE(overwrite))
+  .opts = list(path = normalizePath(path), extension = extension, cache = as.flag(cache), overwrite = as.flag(overwrite))
   rm(list = names(.opts))
 
   # initialize cache
   .cache = Cache()
+
+  # quick sanity check
+  if (anyDuplicated(tolower(Ls())))
+    warningf("The following files would collide on case insensitive file systems: %s",
+             collapse(basename(key2fn(Ls())), sep = ", "))
 
   setClasses(list(
     ls = function(pattern=NULL) {
@@ -98,10 +91,10 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
 
     get = function(key, cache = .opts$cache) {
       checkString(key)
-      Get(key, isTRUE(cache))
+      Get(key, as.flag(cache))
     },
 
-    put = function(..., li = list(), overwrite = .opts$overwrite) {
+    put = function(..., li = list(), overwrite = .opts$overwrite, cache = .opts$cache) {
       args = argsAsNamedList(...)
       if (!is.list(li))
         stop("Argument 'li' must be a list")
@@ -113,19 +106,28 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       checkStrings(keys)
       checkKeysFormat(keys)
       checkKeysDuplicated(keys)
-      checkCollision(keys, Ls(), isTRUE(overwrite))
+      overwrite = as.flag(overwrite)
+      cache = as.flag(cache)
+      checkCollision(keys, Ls(), overwrite)
 
-      invisible(c(Put(args), Put(li)))
+      invisible(c(Put(args, cache=cache), Put(li, cache=cache)))
     },
 
     remove = function(keys) {
       checkStrings(keys, min.len=0L)
-      keys = unique(keys)
+      checkKeysDuplicated(keys)
       fns = key2fn(keys)
+
+      ok = file.exists(fns)
+      if (!all(ok))
+        stopf("Files not found for keys: %s", collapse(keys[!ok]))
+
       ok = file.remove(fns)
       if (!all(ok))
         warningf("Files could not be removed: %s", collapse(fns[!ok], ", "))
+
       .cache$remove(keys[ok])
+
       invisible(setNames(ok, keys))
     },
 
@@ -150,11 +152,11 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
         res
       }
 
-      sapply(keys, wrapper, cache=isTRUE(cache), ..., USE.NAMES=isTRUE(use.names), simplify=isTRUE(simplify))
+      sapply(keys, wrapper, cache=as.flag(cache), ..., USE.NAMES=as.flag(use.names), simplify=as.flag(simplify))
     },
 
     size = function(keys, unit="b") {
-      if (missing(keys)) keys = Ls() else checkStrings(keys)
+      if (missing(keys)) keys = Ls() else checkStrings(keys, min.len=0L)
       match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
 
       size = as.integer(file.info(key2fn(keys))$size)
@@ -162,16 +164,8 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     },
 
     as.list = function(keys, cache = .opts$cache) {
-      if (missing(keys)) {
-        keys = Ls()
-      } else {
-        checkStrings(keys, min.len=0L)
-      }
+      if (missing(keys)) keys = Ls() else  checkStrings(keys, min.len=0L)
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
-    },
-
-    funs = function() {
-      c("ls", "get", "put","remove", "clear", "apply", "size", "as.list", "clear")
     },
 
     cached = function() {

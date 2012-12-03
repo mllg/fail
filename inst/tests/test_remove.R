@@ -13,9 +13,9 @@ test_that("remove", {
   f$put(a = 1, b = 2)
 
   # invalid keys and empty sets
-  expect_warning(f$remove("c"), "No such file")
-  expect_equal(suppressWarnings(f$remove("c")), setNames(FALSE, "c"))
+  expect_error(f$remove("c"), "Files not found")
   expect_error(f$remove())
+  expect_equal(f$remove(character(0L)), setNames(logical(0), character(0)))
 
   # cache
   expect_equal(f$get("a", cache=TRUE), 1)

@@ -19,7 +19,7 @@ test_that("apply", {
   x = f$apply(mean, keys=letters[1:3], simplify=TRUE)
   expect_equal(x, setNames(c(5.5, 50.5, 500.5), letters[1:3]))
 
-  # use.names workds
+  # use.names works
   x = f$apply(mean, keys=letters[1:3], use.names=FALSE)
   expect_true(is.null(names(x)))
 
@@ -35,7 +35,7 @@ test_that("apply", {
 
   # invalid keys and empty sets
   expect_error(f$apply(identity, keys=NULL))
-  expect_equal(f$apply(identity, keys="xxx"), setNames(list(NULL), "xxx"))
+  expect_error(f$apply(identity, keys="xxx"))
   expect_equal(length(f$apply(identity, keys=character(0L))), 0)
   f$remove(f$ls())
   expect_equal(length(f$apply(identity)), 0)

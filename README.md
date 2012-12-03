@@ -18,7 +18,7 @@ A FAL is constructed on a single directory and provides convenient functionallit
 
 For illustration assume we have a directory with multiple (result) files in it. You can create one in your current working directory by using this snippet:
 
-```r
+```splus
 path = file.path(getwd(), "results")
 dir.create(path)
 for (i in 1:10) {
@@ -32,7 +32,7 @@ list.files(path)
 
 ### Initialization
 
-```r
+```splus
 # install package from github using devtools
 library(devtools)
 install_github("fal", username="mllg")
@@ -46,7 +46,7 @@ print(results)
 
 ### Listing files
 
-```r
+```splus
 # use
 results$ls()
 # -or-
@@ -59,7 +59,7 @@ results$ls("_01")
 
 ### Loading R objects
 
-```r
+```splus
 # single objects
 results$get("result_a_01")
 results[["result_a_01"]]
@@ -78,7 +78,7 @@ as.list(results)
 
 ### Saving R objects
 
-```r
+```splus
 # files will be named "foo.RData" and "bar.RData"
 results$put(foo = 1, bar = 101)
 results$put(li = list(foo = 2, bar = 102))
@@ -88,7 +88,7 @@ results[c("foo", "bar")] = c(4, 102)
 
 ### Removing R objects (and corresponding files)
 
-```r
+```splus
 results$remove("foo")
 results[["bar"]] = NULL
 results$remove(results$ls("result_j"))
@@ -96,7 +96,7 @@ results$remove(results$ls("result_j"))
 
 ### Applying functions over R objects
 
-```r
+```splus
 # memory-inefficent (list with all items will first be build)
 sapply(results$as.list(), mean)
 sapply(as.list(results), mean)
@@ -108,7 +108,7 @@ results$apply(mean, keys=results$ls("_a_"), simplify=TRUE)
 
 ### Other utility functions
 
-```r
+```splus
 # useful to considering if loading all files at once is possible
 results$size(unit="Kb")
 

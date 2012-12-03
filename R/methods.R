@@ -15,26 +15,26 @@ print.fal = function(x, ...) {
 
 #' @method names fal_list
 #' @S3method names fal_list
-names.fal = function(x) {
+names.fal_list = function(x) {
   x$ls()
 }
 
 #' @method as.list fal_list
 #' @S3method as.list fal_list
-as.list.fal = function(x, ...) {
+as.list.fal_list = function(x, ...) {
   x$as.list(...)
 }
 
 #' @method [[ fal_list
 #' @S3method [[ fal_list
-`[[.fal` = function(x, key) {
+`[[.fal_list` = function(x, key) {
   # FIXME should return NULL if key does not exists
   x$get(key)
 }
 
 #' @method [[<- fal_list
 #' @S3method [[<- fal_list
-`[[<-.fal` = function(x, key, value) {
+`[[<-.fal_list` = function(x, key, value) {
   if (length(key) > 1L)
     stopf("subscript out of bounds")
   if (is.null(value))
@@ -46,14 +46,14 @@ as.list.fal = function(x, ...) {
 
 #' @method [ fal_list
 #' @S3method [ fal_list
-`[.fal` = function(x, keys) {
+`[.fal_list` = function(x, keys) {
   # FIXME should return NULL if key does not exists
   x$as.list(keys)
 }
 
 #' @method [<- fal_list
 #' @S3method [<- fal_list
-`[<-.fal` = function(x, keys, value) {
+`[<-.fal_list` = function(x, keys, value) {
   if (length(keys) != length(value))
     stop("Length mismatch")
   x$put(li = as.list(setNames(value, keys)))

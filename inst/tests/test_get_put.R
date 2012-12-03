@@ -4,13 +4,13 @@ test_that("list, get, put", {
   path = tempfile()
   f = fal(path)
 
-  expect_equal(f$list(), character(0L))
+  expect_equal(f$ls(), character(0L))
   expect_equal(f$put(a = 1, b = 2), letters[1:2])
-  expect_equal(f$list(), letters[1:2])
+  expect_equal(f$ls(), letters[1:2])
   expect_equal(f$put(li = list(c = 3)), letters[3])
-  expect_equal(f$list(), letters[1:3])
+  expect_equal(f$ls(), letters[1:3])
   f$put(d = 4, li = list(e = 5))
-  expect_equal(f$list(), letters[1:5])
+  expect_equal(f$ls(), letters[1:5])
 
   expect_equal(f$get("a"), 1)
   x = f$as.list()
@@ -18,8 +18,8 @@ test_that("list, get, put", {
   expect_equal(x, y)
 
   # pattern works
-  expect_equal(f$list("^[ab]"), letters[1:2])
-  expect_equal(f$list("x"), character(0L))
+  expect_equal(f$ls("^[ab]"), letters[1:2])
+  expect_equal(f$ls("x"), character(0L))
 
   # invalid keys and empty sets
   expect_error(f$get())

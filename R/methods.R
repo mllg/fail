@@ -21,8 +21,8 @@ names.fal = function(x) {
 
 #' @method as.list fal
 #' @S3method as.list fal
-as.list.fal = function(x, keys) {
-  x$as.list(keys)
+as.list.fal = function(x, ...) {
+  x$as.list(...)
 }
 
 #' @method [[ fal

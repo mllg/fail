@@ -6,9 +6,9 @@ test_that("remove", {
 
   f$put(a = 1, b = 2)
   expect_equal(f$remove("b"), setNames(TRUE, "b"))
-  expect_equal(f$list(), "a")
+  expect_equal(f$ls(), "a")
   f$put(b = 2)
-  expect_equal(f$list(), letters[1:2])
+  expect_equal(f$ls(), letters[1:2])
   expect_equal(f$remove(letters[1:2]), setNames(c(TRUE, TRUE), letters[1:2]))
   f$put(a = 1, b = 2)
 

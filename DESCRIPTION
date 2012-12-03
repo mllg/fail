@@ -12,8 +12,8 @@ Suggests:
     testthat
 ByteCompile: yes
 Collate:
-    'Cache.R'
-    'Fal.R'
     'helper.R'
     'methods.R'
     'zzz.R'
+    'cache.R'
+    'fal.R'

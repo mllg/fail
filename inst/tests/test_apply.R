@@ -29,7 +29,7 @@ test_that("apply", {
   expect_equal(x, setNames(c(5, 50, 500), letters[1:3]))
 
   # error handling
-  f$remove(f$list())
+  f$remove(f$ls())
   f$put(a = 1, b = 2, c = "NA")
   expect_error(f$apply(log), "key 'c'")
 
@@ -37,6 +37,6 @@ test_that("apply", {
   expect_error(f$apply(identity, keys=NULL))
   expect_error(f$apply(identity, keys=""))
   expect_equal(length(f$apply(identity, keys=character(0L))), 0)
-  f$remove(f$list())
+  f$remove(f$ls())
   expect_equal(length(f$apply(identity)), 0)
 })

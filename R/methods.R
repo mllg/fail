@@ -8,31 +8,31 @@ print.fal = function(x, ...) {
       sprintf("  %-9s : .%s", "extension", opts$extension),
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
-      sprintf("  %-9s : %s", "functions", collapse(sort(names(x)), ", ")),
+      sprintf("  %-9s : %s", "functions", collapse(x$funs(), ", ")),
       sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class="fal")), ", ")),
       sep = "\n")
 }
 
-#' @method names fal
-#' @S3method names fal
+#' @method names fal_list
+#' @S3method names fal_list
 names.fal = function(x) {
   x$ls()
 }
 
-#' @method as.list fal
-#' @S3method as.list fal
+#' @method as.list fal_list
+#' @S3method as.list fal_list
 as.list.fal = function(x, ...) {
   x$as.list(...)
 }
 
-#' @method [[ fal
-#' @S3method [[ fal
+#' @method [[ fal_list
+#' @S3method [[ fal_list
 `[[.fal` = function(x, key) {
   x$get(key)
 }
 
-#' @method [[<- fal
-#' @S3method [[<- fal
+#' @method [[<- fal_list
+#' @S3method [[<- fal_list
 `[[<-.fal` = function(x, key, value) {
   # FIXME null removes?
   if (length(key) > 1L)
@@ -41,14 +41,14 @@ as.list.fal = function(x, ...) {
   invisible(x)
 }
 
-#' @method [ fal
-#' @S3method [ fal
+#' @method [ fal_list
+#' @S3method [ fal_list
 `[.fal` = function(x, keys) {
   x$as.list(keys)
 }
 
-#' @method [<- fal
-#' @S3method [<- fal
+#' @method [<- fal_list
+#' @S3method [<- fal_list
 `[<-.fal` = function(x, keys, value) {
   # FIXME null removes?
   if (length(keys) != length(value))

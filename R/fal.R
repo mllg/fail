@@ -10,9 +10,12 @@
 #' @param overwrite [\code{logical(1)}]\cr
 #'   Protect files from being accidently overwritten.
 #'   Global option which can locally be overwritten in most functions.
+#' @param list.interface [\code{logical(1)}]\cr
+#'   Enable S3 methods to enable an interface similar to lists?
+#'   Default is \code{TRUE}.
 #' @return Object of class \code{fal}. See Details.
 #' @export
-fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
+fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, list.interface=TRUE) {
   # Internal functions frequently used, w/o argument checks
   key2fn = function(key) {
     file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
@@ -182,7 +185,11 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
     },
 
+    funs = function() {
+      c("ls", "get", "put","remove", "clear", "apply", "size", "as.list", "clear")
+    },
+
     cached = function() {
       .cache$keys()
-    }), "fal")
+    }), if (isTRUE(list.interface)) c("fal_list", "fal") else "fal")
 }

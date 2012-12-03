@@ -5,12 +5,13 @@ File Abstraction Layer (FAL) for R mimicking a key-value store.
 This package simplifies working with RData files managed in directories.
 A FAL is constructed on a single directory and provides convenient functionallity:
  
-    * Internal handling of path joining
-    * List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression
-    * Create, load, save and remove R object using a key-value syntax
-    * Effiently apply functions on all files or on subsets
-    * Flexible in-memory caching mechanism to avoid reading files multiple times
-    * Choose and mix between the closure interface (`results$as.list()`, `results$list()`) and a list-like interface (`as.list(results)`, `names(results)`)
+    * Internal handling of path joining.
+    * List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression.
+    * Create, load, save and remove R object using a key-value syntax.
+    * Effiently apply functions on all files or on subsets.
+    * Flexible in-memory caching mechanism to avoid reading files multiple times.
+    * Choose and mix between the closure interface (`results$as.list()`, `results$list()`) and a list-like interface (`as.list(results)`, `names(results)`).
+      The latter can be turned off.
 
 
 ## Usage
@@ -32,9 +33,12 @@ list.files(path)
 ### Initialization
 
 ```r
-# install package using devtools
+# install package from github using devtools
 library(devtools)
 install_github("fal", username="mllg")
+
+# load package
+library(fal)
 
 results = fal("results")
 print(results)

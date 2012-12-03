@@ -10,12 +10,9 @@
 #' @param overwrite [\code{logical(1)}]\cr
 #'   Protect files from being accidently overwritten.
 #'   Global option which can locally be overwritten in most functions.
-#' @param list.interface [\code{logical(1)}]\cr
-#'   Enable S3 methods to enable an interface similar to lists?
-#'   Default is \code{TRUE}.
 #' @return Object of class \code{fail}. See Details.
 #' @export
-fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, list.interface=TRUE) {
+fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   # Internal functions frequently used, w/o argument checks
   key2fn = function(key) {
     file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
@@ -179,5 +176,5 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, li
 
     cached = function() {
       .cache$keys()
-    }), if (isTRUE(list.interface)) c("fail_list", "fail") else "fail")
+    }), "fail")
 }

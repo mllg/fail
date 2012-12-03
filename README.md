@@ -1,9 +1,9 @@
-# fal
+# fail
 
-File Abstraction Layer (FAL) for R mimicking a key-value store.
+File Abstraction Interface Layer (FAIL) for R mimicking a key-value store.
 
 This package simplifies working with RData files managed in directories.
-A FAL is constructed on a single directory and provides convenient functionality:
+A FAIL is constructed on a single directory and provides convenient functionality:
  
 * Internal handling of path joining.
 * List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression.
@@ -18,8 +18,8 @@ A FAL is constructed on a single directory and provides convenient functionality
 Install from GitHub using the `devtools` package:
 ```splus
 library(devtools)
-install_github("fal", username="mllg")
-library(fal)
+install_github("fail", username="mllg")
+library(fail)
 ```
 
 ## Usage
@@ -43,18 +43,8 @@ list.files(path)
 ### Initialization
 
 ```splus
-# install dependencies from CRAN
-install.packages("BBmisc")
-
-# install package from github using devtools
-library(devtools)
-install_github("fal", username="mllg")
-
-# load the package
-library(fal)
-
-# initialize a FAL on the previously created directory
-results = fal("results")
+# initialize a FAIL on the previously created directory
+results = fail("results")
 print(results)
 ```
 
@@ -152,7 +142,7 @@ results$cached()
 # working with multiple directories (pseudo code)
 # apply my_function_wrapper on all input data and save results in another directory
 # (these kind of transformations might get a memory optimized function in the future)
-input = fal(tempfile())
-results = fal(tempfile())
+input = fail(tempfile())
+results = fail(tempfile())
 results$put(li = input$apply(my_function_wrapper))
 ```

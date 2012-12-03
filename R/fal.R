@@ -127,7 +127,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE, lis
 
     remove = function(keys) {
       checkStrings(keys)
-      keys = unique(keys[key.exists(keys)])
+      keys = unique(keys)
       fns = key2fn(keys)
       ok = file.remove(fns)
       if (!all(ok))

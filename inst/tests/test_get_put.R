@@ -23,7 +23,7 @@ test_that("list, get, put", {
 
   # invalid keys and empty sets
   expect_error(f$get())
-  expect_error(f$get("not_existing"))
+  expect_equal(f$get("not_existing"), NULL)
   expect_error(f$put(1))
   expect_error(f$put(li=list("a-b" = 1)))
   expect_error(f$put(li=list("..a" = 1)))

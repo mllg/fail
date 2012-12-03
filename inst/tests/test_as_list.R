@@ -12,6 +12,6 @@ test_that("as.list", {
 
   # invalid keys and empty sets
   expect_error(f$as.list(NULL))
-  expect_error(f$as.list("lkasdjjas"))
+  expect_equal(f$as.list("xxx"), setNames(list(NULL), "xxx"))
   expect_equal(length(f$as.list(character(0L))), 0L)
 })

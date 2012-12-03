@@ -35,7 +35,7 @@ test_that("apply", {
 
   # invalid keys and empty sets
   expect_error(f$apply(identity, keys=NULL))
-  expect_error(f$apply(identity, keys=""))
+  expect_equal(f$apply(identity, keys="xxx"), setNames(list(NULL), "xxx"))
   expect_equal(length(f$apply(identity, keys=character(0L))), 0)
   f$remove(f$ls())
   expect_equal(length(f$apply(identity)), 0)

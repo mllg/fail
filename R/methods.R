@@ -28,7 +28,6 @@ as.list.fal_list = function(x, ...) {
 #' @method [[ fal_list
 #' @S3method [[ fal_list
 `[[.fal_list` = function(x, key) {
-  # FIXME should return NULL if key does not exists
   x$get(key)
 }
 
@@ -47,7 +46,6 @@ as.list.fal_list = function(x, ...) {
 #' @method [ fal_list
 #' @S3method [ fal_list
 `[.fal_list` = function(x, keys) {
-  # FIXME should return NULL if key does not exists
   x$as.list(keys)
 }
 

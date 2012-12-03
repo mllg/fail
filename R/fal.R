@@ -1,0 +1,188 @@
+#' Create a file abstraction layer.
+#'
+#' @param path [\code{character(1)}]\cr
+#'   Path to work in, will be created if it does not exists.
+#' @param extension [\code{character(1)}]\cr
+#'   File extension to work with.
+#' @param cache [\code{logical(1)}]\cr
+#'   Use a memory cache as global default.
+#'   Global option which can locally be overwritten in most functions.
+#' @param overwrite [\code{logical(1)}]\cr
+#'   Protect files from being accidently overwritten.
+#'   Global option which can locally be overwritten in most functions.
+#' @return Object of class \code{fal}. See Details.
+#' @export
+fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
+  # Internal functions frequently used, w/o argument checks
+  key2fn = function(key) {
+    file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
+  }
+  key.exists = function(key) {
+    file.exists(key2fn(key))
+  }
+
+  List = function(pattern=NULL) {
+    fns = list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension))
+    keys = sub(sprintf("\\.%s$", .opts$extension), "", fns)
+    if (!is.null(pattern))
+      keys = keys[grepl(pattern, keys)]
+    keys
+  }
+
+  Get = function(key, cache = .opts$cache) {
+    fn = key2fn(key)
+    if (!cache)
+      return(simpleLoad(fn))
+
+    if (key %nin% .cache$keys())
+      .cache$put(key, simpleLoad(fn))
+    .cache$get(key)
+  }
+
+  Put = function(x, cache=.opts$cache) {
+    if (!length(x))
+      return(invisible(character(0L)))
+    keys = names(x)
+    # FIXME cache
+    fns = key2fn(keys)
+    x = list2env(x, parent=emptyenv())
+    for (i in seq_along(keys))
+      save(list = keys[i], file = fns[i], envir = x)
+    keys
+  }
+
+  # Argument checking and initilization
+  checkString(path)
+  checkString(extension)
+
+  if (file.exists(path)) {
+    if (!file_test("-d", path))
+      stopf("Path '%s' is present but not a directory", path)
+    if (file.access(path, mode=4L) != 0L)
+      stopf("Path '%s' is not readable", path)
+    if (file.access(path, mode=2L) != 0L)
+      stopf("Path '%s' is not writeable", path)
+
+    # some sanity checks
+    local({
+      fns = list.files(path, pattern=sprintf("\\.%s$", extension))
+      keys = sub(sprintf("\\.%s$", extension), "", fns)
+      checkKeysFormat(keys)
+      dup = anyDuplicated(tolower(keys))
+      if (dup > 0L)
+        warningf("Some files would collide on case insensitve file names, e.g. '%s'", fns[dup])
+    })
+  } else {
+    if (!dir.create(path))
+      stopf("Could not create directory '%s'", path)
+  }
+
+  if (grepl("[^[:alnum:]]", extension))
+    stop("Extension contains illegal characters: ",
+         collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
+
+  # set up list of options and remove obsolete vars
+  .opts = list(path = normalizePath(path), extension=extension, cache=isTRUE(cache), overwrite=isTRUE(overwrite))
+  rm(list = names(.opts))
+
+  # initialize cache
+  .cache = Cache()
+
+  setClasses(list(
+    list = function(pattern=NULL) {
+      if (!is.null(pattern))
+        checkString(pattern)
+      List(pattern)
+    },
+
+    get = function(key, cache = .opts$cache) {
+      checkString(key)
+      checkKeysExist(key, key.exists(key))
+      Get(key, isTRUE(cache))
+    },
+
+    put = function(..., li = list(), overwrite = .opts$overwrite) {
+      args = argsAsNamedList(...)
+      if (!is.list(li))
+        stop("Argument 'li' must be a list")
+      keys = c(names2(args), names2(li))
+      if (!length(keys))
+        return(character(0L))
+      if (any(is.na(keys)))
+        stop("Could not determine all keys from input")
+      checkStrings(keys)
+      checkKeysFormat(keys)
+      checkKeysDuplicated(keys)
+      checkCollision(keys, List(), isTRUE(overwrite))
+
+      invisible(c(Put(args), Put(li)))
+    },
+
+    remove = function(keys) {
+      checkStrings(keys)
+      checkKeysExist(keys, key.exists(keys))
+      checkKeysDuplicated(keys)
+      fns = key2fn(keys)
+      ok = file.remove(fns)
+      if (!all(ok))
+        warningf("Files could not be removed: %s", collapse(fns[!ok], ", "))
+      .cache$remove(keys[ok])
+      invisible(setNames(ok, keys))
+    },
+
+    clear = function(keys) {
+      if (missing(keys)) {
+        .cache$clear()
+      } else {
+        checkStrings(keys)
+        .cache$remove(keys)
+      }
+      invisible(TRUE)
+    },
+
+    apply = function(FUN, ..., keys, cache=.opts$cache, simplify=FALSE, use.names=TRUE) {
+      FUN = match.fun(FUN)
+      if (missing(keys)) {
+        keys = List()
+      } else {
+        checkStrings(keys, min.len=0L)
+        checkKeysExist(keys, key.exists(keys))
+      }
+
+      wrapper = function(key, cache, ...) {
+        res = try(FUN(Get(key, cache=cache), ...), silent=TRUE)
+        if (is.error(res))
+          stopf("Error applying function on key '%s': %s", key, as.character(res))
+        res
+      }
+
+      sapply(keys, wrapper, cache=isTRUE(cache), ..., USE.NAMES=isTRUE(use.names), simplify=isTRUE(simplify))
+    },
+
+    size = function(keys, unit="b") {
+      if (missing(keys)) {
+        keys = List()
+      } else {
+        checkStrings(keys)
+        checkKeysExist(keys, key.exists(keys))
+      }
+      match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
+
+      size = as.integer(file.info(key2fn(keys))$size)
+      setNames(size / switch(unit, "b"=1L, "Kb"=1024L, "Mb"=1048576L, "Gb"=1073741824L), keys)
+    },
+
+    as.list = function(keys, cache = .opts$cache) {
+      if (missing(keys)) {
+        keys = List()
+      } else {
+        checkStrings(keys, min.len=0L)
+        checkKeysExist(keys, key.exists(keys))
+      }
+      setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
+    },
+
+    cached = function() {
+      .cache$keys()
+    }), "fal")
+}

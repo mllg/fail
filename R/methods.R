@@ -9,7 +9,7 @@ print.fal = function(x, ...) {
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
       sprintf("  %-9s : %s", "functions", collapse(x$funs(), ", ")),
-      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class="fal")), ", ")),
+      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fal$", "", methods(class="fal")), ", ")), #FIXME class rigth?
       sep = "\n")
 }
 
@@ -28,29 +28,32 @@ as.list.fal = function(x, ...) {
 #' @method [[ fal_list
 #' @S3method [[ fal_list
 `[[.fal` = function(x, key) {
+  # FIXME should return NULL if key does not exists
   x$get(key)
 }
 
 #' @method [[<- fal_list
 #' @S3method [[<- fal_list
 `[[<-.fal` = function(x, key, value) {
-  # FIXME null removes?
   if (length(key) > 1L)
     stopf("subscript out of bounds")
-  x$put(li = setNames(list(value), key))
+  if (is.null(value))
+    x$remove(key)
+  else
+    x$put(li = setNames(list(value), key))
   invisible(x)
 }
 
 #' @method [ fal_list
 #' @S3method [ fal_list
 `[.fal` = function(x, keys) {
+  # FIXME should return NULL if key does not exists
   x$as.list(keys)
 }
 
 #' @method [<- fal_list
 #' @S3method [<- fal_list
 `[<-.fal` = function(x, keys, value) {
-  # FIXME null removes?
   if (length(keys) != length(value))
     stop("Length mismatch")
   x$put(li = as.list(setNames(value, keys)))

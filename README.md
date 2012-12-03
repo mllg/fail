@@ -53,7 +53,7 @@ results$ls()
 names(results)
 
 # get subsets using a regular expression
-results$ls("results_a")
+results$ls("result_a")
 results$ls("_01")
 ```
 
@@ -61,8 +61,8 @@ results$ls("_01")
 
 ```r
 # single objects
-results$get("results_a_01")
-results[["results_a_01"]]
+results$get("result_a_01")
+results[["result_a_01"]]
 
 # multiple objects
 keys = results$ls("a") 
@@ -91,7 +91,7 @@ results[c("foo", "bar")] = c(4, 102)
 ```r
 results$remove("foo")
 results[["bar"]] = NULL
-results$remove(results$list("results_j"))
+results$remove(results$ls("result_j"))
 ```
 
 ### Applying functions over R objects
@@ -117,12 +117,15 @@ library(microbenchmark)
 results$put(a = rnorm(100000))
 microbenchmark(results$get("a"), results$get("a", cache=TRUE))
 
-# clear cache
+# simple cache control
+results$cached()
 results$clear()
+results$cached()
 
 # working with multiple directories (pseudo code)
+# apply my_function_wrapper on all input data and save results in another directory
+# (these kind of transformations might get a memory optimized function in the future)
 input = fal(tempfile())
 results = fal(tempfile())
-
 results$put(li = input$apply(my_function_wrapper))
 ```

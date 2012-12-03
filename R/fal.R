@@ -21,7 +21,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     file.exists(key2fn(key))
   }
 
-  List = function(pattern=NULL) {
+  Ls = function(pattern=NULL) {
     fns = list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension))
     keys = sub(sprintf("\\.%s$", .opts$extension), "", fns)
     if (!is.null(pattern))
@@ -89,10 +89,10 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   .cache = Cache()
 
   setClasses(list(
-    list = function(pattern=NULL) {
+    ls = function(pattern=NULL) {
       if (!is.null(pattern))
         checkString(pattern)
-      List(pattern)
+      Ls(pattern)
     },
 
     get = function(key, cache = .opts$cache) {
@@ -113,7 +113,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       checkStrings(keys)
       checkKeysFormat(keys)
       checkKeysDuplicated(keys)
-      checkCollision(keys, List(), isTRUE(overwrite))
+      checkCollision(keys, Ls(), isTRUE(overwrite))
 
       invisible(c(Put(args), Put(li)))
     },
@@ -143,7 +143,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     apply = function(FUN, ..., keys, cache=.opts$cache, simplify=FALSE, use.names=TRUE) {
       FUN = match.fun(FUN)
       if (missing(keys)) {
-        keys = List()
+        keys = Ls()
       } else {
         checkStrings(keys, min.len=0L)
         checkKeysExist(keys, key.exists(keys))
@@ -161,7 +161,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
 
     size = function(keys, unit="b") {
       if (missing(keys)) {
-        keys = List()
+        keys = Ls()
       } else {
         checkStrings(keys)
         checkKeysExist(keys, key.exists(keys))
@@ -174,7 +174,7 @@ fal = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
 
     as.list = function(keys, cache = .opts$cache) {
       if (missing(keys)) {
-        keys = List()
+        keys = Ls()
       } else {
         checkStrings(keys, min.len=0L)
         checkKeysExist(keys, key.exists(keys))

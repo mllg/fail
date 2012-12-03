@@ -1,9 +1,9 @@
 #' @method print fal
 #' @S3method print fal
 print.fal = function(x, ...) {
-  opts = environment(x$list)$.opts
+  opts = environment(x$ls)$.opts
   cat(sprintf("Key-value store on directory '%s':", opts$path),
-      sprintf("  %-9s : %i", "items", length(x$list())),
+      sprintf("  %-9s : %i", "items", length(x$ls())),
       sprintf("  %-9s : %i", "cached", length(x$cached())),
       sprintf("  %-9s : .%s", "extension", opts$extension),
       sprintf("  %-9s : %s", "cache", opts$cache),
@@ -16,7 +16,7 @@ print.fal = function(x, ...) {
 #' @method names fal
 #' @S3method names fal
 names.fal = function(x) {
-  x$list()
+  x$ls()
 }
 
 #' @method as.list fal
@@ -34,6 +34,7 @@ as.list.fal = function(x, keys) {
 #' @method [[<- fal
 #' @S3method [[<- fal
 `[[<-.fal` = function(x, key, value) {
+  # FIXME null removes?
   if (length(key) > 1L)
     stopf("subscript out of bounds")
   x$put(li = setNames(list(value), key))
@@ -49,6 +50,7 @@ as.list.fal = function(x, keys) {
 #' @method [<- fal
 #' @S3method [<- fal
 `[<-.fal` = function(x, keys, value) {
+  # FIXME null removes?
   if (length(keys) != length(value))
     stop("Length mismatch")
   x$put(li = as.list(setNames(value, keys)))

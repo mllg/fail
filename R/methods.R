@@ -35,12 +35,15 @@ as.list.fail_list = function(x, ...) {
 #' @method [[<- fail_list
 #' @S3method [[<- fail_list
 `[[<-.fail_list` = function(x, key, value) {
-  if (length(key) > 1L)
-    stopf("subscript out of bounds")
-  if (is.null(value))
+  # let R's list operator handle all the crazy rules
+  li = list()
+  li[[key]] = value
+
+  if (is.null(value)) {
     x$remove(key)
-  else
-    x$put(li = setNames(list(value), key))
+  } else {
+    x$put(li = li)
+  }
   invisible(x)
 }
 
@@ -53,10 +56,15 @@ as.list.fail_list = function(x, ...) {
 #' @method [<- fail_list
 #' @S3method [<- fail_list
 `[<-.fail_list` = function(x, keys, value) {
-  if (length(keys) != length(value))
-    stop("Length mismatch")
-  isnull = vapply(value, is.null, TRUE)
-  x$remove(keys[isnull])
-  x$put(li = as.list(setNames(value[!isnull], keys[!isnull])))
+  if (length(keys) == 0L)
+    keys = x$ls()
+  # let R's list operator handle all the crazy rules
+  li = list()
+  li[keys] <- value
+
+  # remove those which were NULL and put the rest
+  x$remove(setdiff(keys, names(li)))
+  x$put(li = li)
+
   invisible(x)
 }

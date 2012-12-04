@@ -74,6 +74,9 @@ results$as.list(keys)
 
 # all objects
 results$as.list() # or as.list(results)
+
+# read all files quickly into a list as one-liner
+results = as.list(fail("results"))
 ```
 
 ### Saving R objects

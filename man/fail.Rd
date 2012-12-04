@@ -1,6 +1,6 @@
 \name{fail}
 \alias{fail}
-\title{Create a file abstraction layer.}
+\title{Create a file abstraction interface layer (FAIL).}
 \usage{
   fail(path = getwd(), extension = "RData", cache = FALSE,
     overwrite = TRUE)
@@ -24,6 +24,16 @@
   Object of class \code{fail}. See Details.
 }
 \description{
-  Create a file abstraction layer.
+  This is the constructor of a fail object which provides
+  functions as described in the details.
+}
+\details{
+  An object with the following functions is returned:
+  \describe{ \item{\code{ls(pattern=NULL)}}{ Function to
+  list keys in directory \code{path}.  }
+  \item{\code{get(key, cache)}}{ Function to load a file
+  identified by \code{key} from directory \code{path}.
+  Argument \code{cache} can be set to temporarily overwrite
+  the global \code{cache} flag.  } }
 }
 

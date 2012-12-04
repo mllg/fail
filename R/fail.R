@@ -1,4 +1,12 @@
-#' Create a file abstraction layer.
+#' Create a file abstraction interface layer (FAIL).
+#'
+#' This is the constructor of a fail object which provides functions as described in the details.
+#' The general idea is to not bother about file path joining and file extensions.
+#' Instead FAIL offers a key-value like interface to RData files in a specified directory.
+#' The filename (without extension) acts as the key while the object inside the RData file is the value.
+#' Files can be refered to using just the keys.
+#' FAIL offers besides some utilitiy functions implementations for the basic operations \dQuote{list},
+#' \dQuote{load}, \dQuote{save}, \dQuote{remove} and \dQuote{apply}.
 #'
 #' @param path [\code{character(1)}]\cr
 #'   Path to work in, will be created if it does not exists.
@@ -11,6 +19,31 @@
 #'   Protect files from being accidently overwritten.
 #'   Global option which can locally be overwritten in most functions.
 #' @return Object of class \code{fail}. See Details.
+#' @details
+#'  For a quick introduction on the usage, see \url{https://github.com/mllg/fail}.
+#'
+#'  An object with the following functions is returned:
+#' \describe{
+#'   \item{\code{ls(pattern=NULL)}}{
+#'     Function to list keys in directory \code{path}.
+#'   }
+#'   \item{\code{get(key, cache)}}{
+#'     Function to load a file identified by \code{key} from directory \code{path}.
+#'     Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'   }
+#'   \item{\code{put(..., li, overwrite, cache)}}{
+#'     Function to save objects to to directory \code{path}.
+#'     Names for objects provided via \code{...} will be looked up or can be provided using \code{key = value} syntax.
+#'     Further object can be passed as a named list using \code{li}: Each list item will be saved to a separate file.
+#'     Arguments \code{overwrite} and \code{cache} temporarily overwrite the global \code{overwrite} or \code{cache} flags, respectively.
+#'   }
+#'   \item{\code{remove(keys)}}{
+#'     Function to remove files identified by \code{keys} from directory \code{path}.
+#'   }
+#'   \item{\code{apply(FUN, ..., keys, cache, simplify=FALSE, use.names=TRUE)}}{
+#'
+#'   }
+#' }
 #' @export
 fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   # Internal functions frequently used, w/o argument checks

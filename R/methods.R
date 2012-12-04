@@ -15,6 +15,6 @@ print.fail = function(x, ...) {
 
 #' @method as.list fail
 #' @S3method as.list fail
-as.list.fail = function(x) {
-  x$as.list()
+as.list.fail = function(x, ...) {
+  x$as.list(...)
 }

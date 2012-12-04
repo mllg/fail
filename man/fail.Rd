@@ -86,7 +86,7 @@
 }
 \examples{
 # initialize a FAIL in a temporary directory
-files <- fail(tempfile(""))
+files = fail(tempfile(""))
 
 # save x and y, vectors of random numbers
 x = runif(100)
@@ -112,6 +112,6 @@ files$size()
 files$get("x", cache=TRUE)
 files$cached()
 files$clear()
-files$cached
+files$cached()
 }
 

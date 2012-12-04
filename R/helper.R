@@ -14,7 +14,6 @@ as.flag = function(x) {
   return(conv)
 }
 
-
 checkString = function(x, na.ok=FALSE) {
   if (missing(x) || !is.character(x) || length(x) != 1L || (!na.ok && is.na(x)))
     stopf("Argument '%s' must be a character vector of length 1", deparse(substitute(x)))

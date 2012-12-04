@@ -66,7 +66,7 @@
 #' @export
 #' @examples
 #' # initialize a FAIL in a temporary directory
-#' files <- fail(tempfile(""))
+#' files = fail(tempfile(""))
 #'
 #' # save x and y, vectors of random numbers
 #' x = runif(100)
@@ -92,7 +92,7 @@
 #' files$get("x", cache=TRUE)
 #' files$cached()
 #' files$clear()
-#' files$cached
+#' files$cached()
 fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   # Internal functions frequently used, w/o argument checks
   key2fn = function(key) {

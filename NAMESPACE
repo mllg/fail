@@ -1,5 +1,6 @@
 S3method(as.list,fail)
 S3method(print,fail)
+export(fail)
 importFrom(BBmisc,"%nin%")
 importFrom(BBmisc,collapse)
 importFrom(BBmisc,is.error)

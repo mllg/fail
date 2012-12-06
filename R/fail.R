@@ -31,10 +31,13 @@
 #'       Function to load a file identified by \code{key} from directory \code{path}.
 #'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
 #'     }
-#'     \item{\code{put(..., li, overwrite, cache)}}{
+#'     \item{\code{put(..., li, keys, overwrite, cache)}}{
 #'       Function to save objects to to directory \code{path}.
 #'       Names for objects provided via \code{...} will be looked up or can be provided using a \code{key = value} syntax.
 #'       More objects can be passed as a named list using the argument \code{li}: Each list item will be saved to a separate file.
+#'       If you provide \code{keys} as a character vector, these keys will be taken instead.
+#'       The vector than must be of length \code{length(...) + length(li)}. The first keys will be used to name objects in \code{...},
+#'       the remaining to name objects in \code{li}.
 #'       Arguments \code{overwrite} and \code{cache} temporarily overwrite the global \code{overwrite} or \code{cache} flags, respectively.
 #'     }
 #'     \item{\code{remove(keys)}}{
@@ -175,13 +178,23 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       Get(key, as.flag(cache))
     },
 
-    put = function(..., li = list(), overwrite = .opts$overwrite, cache = .opts$cache) {
-      args = argsAsNamedList(...)
+    put = function(..., li = list(), keys, overwrite = .opts$overwrite, cache = .opts$cache) {
       if (!is.list(li))
         stop("Argument 'li' must be a list")
-      keys = c(names2(args), names2(li))
-      if (!length(keys))
+      args = argsAsNamedList(...)
+      nargs = length(args) + length(li)
+      if (!nargs) {
         return(character(0L))
+
+      if (!missing(keys)) {
+        checkStrings(keys)
+        if (length(keys) != nargs)
+          stopf("Provided %i keys, but %i required", length(keys), nargs)
+        names(args) = head(keys, length(args))
+        names(li) = tail(keys, length(li))
+      }
+
+      keys = c(names2(args), names2(li))
       if (any(is.na(keys)))
         stop("Could not determine all keys from input")
       checkStrings(keys)

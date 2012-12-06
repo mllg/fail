@@ -3,7 +3,7 @@
 File Abstraction Interface Layer (FAIL) for R mimicking a key-value store.
 
 This package simplifies working with RData files managed in directories.
-A FAIL is constructed on a single directory and provides convenient functionality:
+A FAIL is constructed on a single directory and provides the following functionality:
  
 * Internal handling of path joining.
 * List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression.
@@ -14,7 +14,12 @@ A FAIL is constructed on a single directory and provides convenient functionalit
 
 ## Installation
 
-Install from GitHub using the `devtools` package:
+Install from CRAN:
+```splus
+install.packages("fail")
+```
+
+Alternatively, you can also install the latest development version from GitHub using the `devtools` package:
 ```splus
 library(devtools)
 install_github("fail", username="mllg")

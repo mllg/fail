@@ -115,7 +115,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   Get = function(key, cache = .opts$cache) {
     fn = key2fn(key)
     if (!file.exists(fn))
-      stopf("File for key '%s' not found", key)
+      stopf("File for key '%s' (%s) not found", key, fn)
     if (!cache)
       return(simpleLoad(fn))
     if (key %nin% .cache$keys())

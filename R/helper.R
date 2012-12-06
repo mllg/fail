@@ -25,9 +25,9 @@ checkStrings = function(x, min.len=1L, na.ok=FALSE) {
 }
 
 checkKeysFormat = function(keys) {
-  ok = grepl("^\\.{0,1}[[:alpha:]_]{1}[[:alnum:]._]*$", keys)
+  ok = grepl("^\\.{0,1}[[:alpha:]_]{1}[[:alnum:]._-]*$", keys)
   if (!all(ok))
-    stopf("Illegal format for keys: '%s'", collapse(keys[!ok]))
+
 }
 
 checkKeysDuplicated = function(keys) {

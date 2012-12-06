@@ -17,6 +17,15 @@ test_that("list, get, put", {
   y = setNames(as.list(1:5), letters[1:5])
   expect_equal(x, y)
 
+  path = tempfile()
+  f = fail(path)
+  f$put(1, 2, 3, keys = c("x", "y", "z"))
+  expect_equal(f$ls(), c("x", "y", "z"))
+  f$remove(f$ls())
+  f$put(1, 2, 3, li = list(foo = 5), keys = c("x", "y", "z", "foo"))
+  expect_equal(f$get("x"), 1)
+  expect_equal(f$get("foo"), 5)
+
   # pattern works
   expect_equal(f$ls("^[ab]"), letters[1:2])
   expect_equal(f$ls("x"), character(0L))

@@ -183,7 +183,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
         stop("Argument 'li' must be a list")
       args = argsAsNamedList(...)
       nargs = length(args) + length(li)
-      if (!nargs) {
+      if (!nargs)
         return(character(0L))
 
       if (!missing(keys)) {

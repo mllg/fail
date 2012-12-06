@@ -48,28 +48,33 @@
   identified by \code{key} from directory \code{path}.
   Argument \code{cache} can be set to temporarily overwrite
   the global \code{cache} flag.  } \item{\code{put(..., li,
-  overwrite, cache)}}{ Function to save objects to to
+  keys, overwrite, cache)}}{ Function to save objects to to
   directory \code{path}.  Names for objects provided via
   \code{...} will be looked up or can be provided using a
   \code{key = value} syntax.  More objects can be passed as
   a named list using the argument \code{li}: Each list item
-  will be saved to a separate file.  Arguments
-  \code{overwrite} and \code{cache} temporarily overwrite
-  the global \code{overwrite} or \code{cache} flags,
-  respectively.  } \item{\code{remove(keys)}}{ Function to
-  remove files identified by \code{keys} from directory
-  \code{path}.  } \item{\code{apply(FUN, ..., keys, cache,
-  simplify=FALSE, use.names=TRUE)}}{ Apply a function
-  \code{FUN} on files identified by \code{keys}. The loaded
-  R objects will be past unnamed as first argument.  Use
-  \code{...} for additional function arguments.  Argument
-  \code{cache} can be set to temporarily overwrite the
-  global \code{cache} flag.  For arguments \code{simplify}
-  and \code{use.names}, see \code{\link{lapply}}.  Keys
-  will be used to name the (possibly simplified) returned
-  list.  } \item{\code{as.list(keys, cache)}}{ Return a
-  named list of \code{keys}. \code{keys} defaults to all
-  keys available.  Argument \code{cache} can be set to
+  will be saved to a separate file.  If you provide
+  \code{keys} as a character vector, these keys will be
+  taken instead.  The vector than must be of length
+  \code{length(...) + length(li)}. The first keys will be
+  used to name objects in \code{...}, the remaining to name
+  objects in \code{li}.  Arguments \code{overwrite} and
+  \code{cache} temporarily overwrite the global
+  \code{overwrite} or \code{cache} flags, respectively.  }
+  \item{\code{remove(keys)}}{ Function to remove files
+  identified by \code{keys} from directory \code{path}.  }
+  \item{\code{apply(FUN, ..., keys, cache, simplify=FALSE,
+  use.names=TRUE)}}{ Apply a function \code{FUN} on files
+  identified by \code{keys}. The loaded R objects will be
+  past unnamed as first argument.  Use \code{...} for
+  additional function arguments.  Argument \code{cache} can
+  be set to temporarily overwrite the global \code{cache}
+  flag.  For arguments \code{simplify} and
+  \code{use.names}, see \code{\link{lapply}}.  Keys will be
+  used to name the (possibly simplified) returned list.  }
+  \item{\code{as.list(keys, cache)}}{ Return a named list
+  of \code{keys}. \code{keys} defaults to all keys
+  available.  Argument \code{cache} can be set to
   temporarily overwrite the global \code{cache} flag.  }
   \item{\code{clear(keys)}}{ Clear the cache to free
   memory. \code{keys} defaults to all keys available.  }

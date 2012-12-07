@@ -14,26 +14,48 @@ as.flag = function(x) {
   return(conv)
 }
 
-checkString = function(x, na.ok=FALSE) {
-  if (missing(x) || !is.character(x) || length(x) != 1L || (!na.ok && is.na(x)))
-    stopf("Argument '%s' must be a character vector of length 1", deparse(substitute(x)))
+assert.string = function(x, na.ok=FALSE) {
+  if (missing(x))
+    stopf("Argument '%s' is missing", deparse(substitute(x)))
+  if (!is.character(x))
+    stopf("Argument '%s' must be of type character", deparse(substitute(x)))
+  if (length(x) != 1L)
+    stopf("Argument '%s' must have length 1", deparse(substitute(x)))
+  if (!na.ok && is.na(x))
+    stopf("Arguments '%s' is NA", deparse(substitute(x)))
 }
 
-checkStrings = function(x, min.len=1L, na.ok=FALSE) {
-  if (missing(x) || !is.character(x) || length(x) < min.len || (!na.ok && any(is.na(x))))
-    stopf("Argument '%s' must be a character vector of length >=%i", deparse(substitute(x)), min.len)
-}
+as.keys = function(keys, min.len, len, na.ok=FALSE, default) {
+  if (missing(keys)) {
+    if (missing(default))
+      stop("Argument 'keys' is missing")
+    return(default)
+  }
 
-checkKeysFormat = function(keys) {
-  ok = grepl("^\\.{0,1}[[:alpha:]_]{1}[[:alnum:]._-]*$", keys)
-  if (!all(ok))
+  if (!is.character(keys)) {
+    keys = try(as.character(keys))
+    if (is.error(keys))
+      stop("Argument 'keys' must be of type character or be convertible to character")
+  }
 
-}
+  if (!missing(len)) {
+    if (length(keys) != len)
+      stop("Argument 'keys' must have length ", len)
+  } else {
+    if (!missing(min.len) && length(keys) <= min.len)
+      stop("Argument 'keys' must have length >=", min.len)
+  }
 
-checkKeysDuplicated = function(keys) {
-  ok = anyDuplicated(keys)
-  if (ok > 0L)
-    stopf("Duplicated key '%s'", keys[ok])
+  if (!na.ok && any(is.na(keys)))
+    stop("Arguments 'keys' contains NAs")
+
+  # R variable pattern: "^((\\.[[:alpha:]._]+)|([[:alpha:]]+))[[:alnum:]_.]*$"
+  pattern = "^[[:alnum:]._-]+$"
+  ok = grepl(pattern, keys)
+  if (! all(ok))
+    stopf("Key '%s' in illeagal format, see help", head(keys[!ok], 1L))
+
+  return(keys)
 }
 
 names2 = function(x) {
@@ -47,10 +69,11 @@ argsAsNamedList = function(...) {
   args = list(...)
   ns = names2(args)
   ns.missing = is.na(ns)
-  if(any(ns.missing)) {
+  if (any(ns.missing)) {
     ns.sub = as.character(substitute(deparse(...)))[-1L]
     ns[ns.missing] = ns.sub[ns.missing]
   }
+  ns[ns %in% c("NA", "NULL", "")] <- NA_character_
   setNames(args, ns)
 }
 

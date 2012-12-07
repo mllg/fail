@@ -2,6 +2,8 @@ Version 1.1 (2012-12-xx)
 -------------------------------------------------------------------------------
 
 * New argument in closure "$put": keys
+* More informative error messages
+* Relaxed checks for illegal characters in keys
 
 
 

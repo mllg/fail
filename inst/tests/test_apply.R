@@ -34,7 +34,7 @@ test_that("apply", {
   expect_error(f$apply(log), "key 'c'")
 
   # invalid keys and empty sets
-  expect_error(f$apply(identity, keys=NULL))
+  expect_equal(length(f$apply(identity, keys=NULL)), 0)
   expect_error(f$apply(identity, keys="xxx"))
   expect_equal(length(f$apply(identity, keys=character(0L))), 0)
   f$remove(f$ls())

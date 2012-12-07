@@ -27,25 +27,22 @@ test_that("list, get, put", {
   expect_equal(f$get("foo"), 5)
 
   # pattern works
-  expect_equal(f$ls("^[ab]"), letters[1:2])
-  expect_equal(f$ls("x"), character(0L))
+  expect_equal(f$ls("^[xy]"), c("x", "y"))
+  expect_equal(f$ls("a"), character(0L))
 
   # invalid keys and empty sets
   expect_error(f$get())
   expect_error(f$get("not_existing"))
-  expect_error(f$put(1))
-  expect_error(f$put(li=list("a-b" = 1)))
-  expect_error(f$put(li=list("..a" = 1)))
-  expect_error(f$put(li=list("..1" = 1)))
+  expect_error(f$put(li=list("a - b" = 1)))
   expect_equal(f$put(), character(0L))
 
   # overwrite protect
-  expect_error(f$put(a=1, overwrite=FALSE))
+  expect_error(f$put(x=1, overwrite=FALSE))
 
   # cache
   expect_equal(f$cached(), character(0L))
-  f$get("a", cache=TRUE)
-  expect_equal(f$cached(), "a")
+  f$get("x", cache=TRUE)
+  expect_equal(f$cached(), "x")
   f$clear()
   expect_equal(f$cached(), character(0L))
 })

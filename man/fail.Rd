@@ -40,10 +40,10 @@
   For a quick introduction on the usage, see
   \url{https://github.com/mllg/fail}.
 
-  An object with the following functions is returned:
-  \describe{ \item{\code{ls(pattern=NULL)}}{ Function to
-  list keys in directory \code{path} matching a regular
-  expression pattern \code{pattern}.  }
+  An object with the following functions is returned by
+  \code{fail}: \describe{ \item{\code{ls(pattern=NULL)}}{
+  Function to list keys in directory \code{path} matching a
+  regular expression pattern \code{pattern}.  }
   \item{\code{get(key, cache)}}{ Function to load a file
   identified by \code{key} from directory \code{path}.
   Argument \code{cache} can be set to temporarily overwrite
@@ -88,6 +88,20 @@
   respectively.  } } Furthermore the package provides S3
   methods for \code{\link{print}} and
   \code{\link{as.list}}.
+
+  Be aware of the following restriction regarding file
+  names and keys: The package performs some basic checks
+  for illegal characters on the key names.  In principle
+  all characters matching the pattern
+  \dQuote{[a-zA-Z0-9._-]} are allowed and should work on
+  most or all file systems.  But be careful with key names
+  which are not compatible with R's variable naming
+  restrictions, e.g. using the minus character: these can
+  have unwanted side effects.
+
+  If two files would collide on case-insensitive file
+  systems like Windows' NTFS, the package will throw some
+  warnings.
 }
 \examples{
 # initialize a FAIL in a temporary directory

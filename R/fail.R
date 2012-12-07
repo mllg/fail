@@ -22,7 +22,7 @@
 #' @details
 #'   For a quick introduction on the usage, see \url{https://github.com/mllg/fail}.
 #'
-#'   An object with the following functions is returned:
+#'   An object with the following functions is returned by \code{fail}:
 #'   \describe{
 #'     \item{\code{ls(pattern=NULL)}}{
 #'       Function to list keys in directory \code{path} matching a regular expression pattern \code{pattern}.
@@ -66,6 +66,14 @@
 #'    }
 #'   }
 #'   Furthermore the package provides S3 methods for \code{\link{print}} and \code{\link{as.list}}.
+#'
+#'   Be aware of the following restriction regarding file names and keys:
+#'   The package performs some basic checks for illegal characters on the key names.
+#'   In principle all characters matching the pattern \dQuote{[a-zA-Z0-9._-]} are allowed and should work on most or all file systems.
+#'   But be careful with key names which are not compatible with R's variable naming restrictions, e.g. using the minus character: these can have unwanted side effects.
+#'
+#'   If two files would collide on case-insensitive file systems like Windows' NTFS, the package will throw some  warnings.
+#'
 #' @export
 #' @examples
 #' # initialize a FAIL in a temporary directory
@@ -135,8 +143,8 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   }
 
   # Argument checking and initilization
-  checkString(path)
-  checkString(extension)
+  assert.string(path)
+  assert.string(extension)
 
   if (file.exists(path)) {
     if (!file_test("-d", path))
@@ -169,13 +177,12 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   setClasses(list(
     ls = function(pattern=NULL) {
       if (!is.null(pattern))
-        checkString(pattern)
+        assert.string(pattern)
       Ls(pattern)
     },
 
     get = function(key, cache = .opts$cache) {
-      checkString(key)
-      Get(key, as.flag(cache))
+      Get(as.keys(key, len=1L), as.flag(cache))
     },
 
     put = function(..., li = list(), keys, overwrite = .opts$overwrite, cache = .opts$cache) {
@@ -183,23 +190,26 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
         stop("Argument 'li' must be a list")
       args = argsAsNamedList(...)
       nargs = length(args) + length(li)
-      if (!nargs)
-        return(character(0L))
 
       if (!missing(keys)) {
-        checkStrings(keys)
-        if (length(keys) != nargs)
-          stopf("Provided %i keys, but %i required", length(keys), nargs)
+        keys = as.keys(keys, len = nargs)
         names(args) = head(keys, length(args))
         names(li) = tail(keys, length(li))
+      } else {
+        keys.args = names2(args)
+        if (any(is.na(keys.args)))
+          stop("Could not determine all names from '...' arguments. Consider using key=value syntax")
+
+        keys.li = names2(li)
+        if (any(is.na(keys.li)))
+          stop("Argument 'li' must be a fully named list")
+
+        keys = as.keys(c(keys.args, keys.li))
       }
 
-      keys = c(names2(args), names2(li))
-      if (any(is.na(keys)))
-        stop("Could not determine all keys from input")
-      checkStrings(keys)
-      checkKeysFormat(keys)
-      checkKeysDuplicated(keys)
+      if (anyDuplicated(keys))
+        stopf("Argument 'keys' contains duplicated name: %s", head(keys[duplicated(keys)], 1L))
+
       overwrite = as.flag(overwrite)
       cache = as.flag(cache)
       checkCollision(keys, Ls(), overwrite)
@@ -208,8 +218,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     },
 
     remove = function(keys) {
-      checkStrings(keys, min.len=0L)
-      checkKeysDuplicated(keys)
+      keys = unique(as.keys(keys))
       fns = key2fn(keys)
 
       ok = file.exists(fns)
@@ -228,7 +237,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
 
     apply = function(FUN, ..., keys, cache=.opts$cache, simplify=FALSE, use.names=TRUE) {
       FUN = match.fun(FUN)
-      if (missing(keys)) keys = Ls() else checkStrings(keys, min.len=0L)
+      keys = as.keys(keys, default = Ls())
 
       wrapper = function(key, cache, ...) {
         res = try(FUN(Get(key, cache=cache), ...), silent=TRUE)
@@ -241,7 +250,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     },
 
     size = function(keys, unit="b") {
-      if (missing(keys)) keys = Ls() else checkStrings(keys, min.len=0L)
+      keys = if (missing(keys)) Ls() else as.keys(keys)
       match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
 
       size = as.integer(file.info(key2fn(keys))$size)
@@ -249,7 +258,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     },
 
     as.list = function(keys, cache = .opts$cache) {
-      if (missing(keys)) keys = Ls() else  checkStrings(keys, min.len=0L)
+      keys = if (missing(keys)) Ls() else  as.keys(keys)
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
     },
 
@@ -257,8 +266,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       if (missing(keys)) {
         .cache$clear()
       } else {
-        checkStrings(keys)
-        .cache$remove(keys)
+        .cache$remove(as.keys(keys))
       }
       invisible(TRUE)
     },

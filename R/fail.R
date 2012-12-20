@@ -106,22 +106,15 @@
 #' files$cached()
 fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   # Internal functions frequently used, w/o argument checks
-  key2fn = function(key) {
-    file.path(.opts$path, sprintf("%s.%s", key, .opts$extension))
-  }
-  fn2key = function(fn) {
-    sub(sprintf("\\.%s$", .opts$extension), "", fn)
-  }
-
   Ls = function(pattern=NULL) {
-    keys = fn2key(list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension)))
+    keys = fn2key(.opts, list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension)))
     if (!is.null(pattern))
       keys = keys[grepl(pattern, keys)]
     keys
   }
 
   Get = function(key, cache = .opts$cache) {
-    fn = key2fn(key)
+    fn = key2fn(.opts, key)
     if (!file.exists(fn))
       stopf("File for key '%s' (%s) not found", key, fn)
     if (!cache)
@@ -139,7 +132,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     if (cache)
       mapply(.cache$put, key=keys, value=x, USE.NAMES=FALSE, SIMPLIFY=FALSE)
 
-    invisible(mapply(simpleSave, fn=key2fn(keys), key=keys, value=x, USE.NAMES=FALSE))
+    invisible(mapply(simpleSave, fn=key2fn(.opts, keys), key=keys, value=x, USE.NAMES=FALSE))
   }
 
   # Argument checking and initilization
@@ -172,7 +165,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   # quick sanity check
   if (anyDuplicated(tolower(Ls())))
     warningf("The following files would collide on case insensitive file systems: %s",
-             collapse(basename(key2fn(Ls())), sep = ", "))
+             collapse(basename(key2fn(.opts, Ls())), sep = ", "))
 
   setClasses(list(
     ls = function(pattern=NULL) {
@@ -219,7 +212,7 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
 
     remove = function(keys) {
       keys = unique(as.keys(keys))
-      fns = key2fn(keys)
+      fns = key2fn(.opts, keys)
 
       ok = file.exists(fns)
       if (!all(ok))
@@ -253,13 +246,22 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       keys = if (missing(keys)) Ls() else as.keys(keys)
       match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
 
-      size = as.integer(file.info(key2fn(keys))$size)
+      size = as.integer(file.info(key2fn(.opts, keys))$size)
       setNames(size / switch(unit, "b"=1L, "Kb"=1024L, "Mb"=1048576L, "Gb"=1073741824L), keys)
     },
 
     as.list = function(keys, cache = .opts$cache) {
       keys = if (missing(keys)) Ls() else  as.keys(keys)
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
+    },
+
+    assign = function(keys, pos = -1L, envir = as.environment(pos)) {
+      keys = if (missing(keys)) Ls() else as.keys(keys)
+
+      for (key in keys) {
+        assign("key", Get(key), pos = pos, envir = envir)
+      }
+      invisible(TRUE)
     },
 
     clear = function(keys) {

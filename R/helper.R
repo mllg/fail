@@ -102,3 +102,11 @@ checkCollision = function(new, existing, overwrite) {
   if (any(found.insens))
     warningf("Keys with same (case insensitve) name already present: '%s'", collapse(new[found.insens], ", "))
 }
+
+key2fn = function(opts, key) {
+  file.path(opts$path, sprintf("%s.%s", key, opts$extension))
+}
+fn2key = function(opts, fn) {
+  sub(sprintf("\\.%s$", opts$extension), "", fn)
+}
+

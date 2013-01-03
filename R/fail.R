@@ -255,11 +255,12 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
     },
 
-    assign = function(keys, pos = -1L, envir = as.environment(pos)) {
+    assign = function(keys, envir = parent.frame()) {
+      force(envir)
       keys = if (missing(keys)) Ls() else as.keys(keys)
 
       for (key in keys) {
-        assign("key", Get(key), pos = pos, envir = envir)
+        assign(key, Get(key), envir = envir)
       }
       invisible(TRUE)
     },

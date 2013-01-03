@@ -1,1 +1,1 @@
-attach method
+use file.access only on non-windows systems

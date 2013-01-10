@@ -1,2 +1,1 @@
-- use file.access only on non-windows systems
-- documentation for assign
+- tests for assign

@@ -8,13 +8,13 @@ as.flag = function(x) {
       stopf("Argument %s may not be NA", deparse(substitute(x)))
     return(x)
   }
-  conv = try(as.logical(x), silent=TRUE)
+  conv = try(as.logical(x), silent = TRUE)
   if (is.error(conv) || length(conv) != 1L || is.na(conv))
     stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
   return(conv)
 }
 
-assert.string = function(x, na.ok=FALSE) {
+assert.string = function(x, na.ok = FALSE) {
   if (missing(x))
     stopf("Argument '%s' is missing", deparse(substitute(x)))
   if (!is.character(x))
@@ -25,7 +25,7 @@ assert.string = function(x, na.ok=FALSE) {
     stopf("Arguments '%s' is NA", deparse(substitute(x)))
 }
 
-as.keys = function(keys, min.len, len, na.ok=FALSE, default) {
+as.keys = function(keys, min.len, len, na.ok = FALSE, default) {
   if (missing(keys)) {
     if (missing(default))
       stop("Argument 'keys' is missing")
@@ -78,8 +78,8 @@ argsAsNamedList = function(...) {
 }
 
 simpleLoad = function(fn) {
-  ee = new.env(parent=emptyenv())
-  ns = load(fn, envir=ee)
+  ee = new.env(parent = emptyenv(), hash = FALSE)
+  ns = load(fn, envir = ee)
   if (length(ns) == 1L) {
     ee[[ns]]
   } else {
@@ -88,9 +88,9 @@ simpleLoad = function(fn) {
 }
 
 simpleSave = function(fn, key, value) {
-  ee = new.env(parent=emptyenv(), hash=FALSE)
-  assign(key, value, envir=ee)
-  save(list=key, envir=ee, file=fn)
+  ee = new.env(parent = emptyenv(), hash = FALSE)
+  assign(key, value, envir = ee)
+  save(list = key, envir = ee, file = fn)
   key
 }
 
@@ -106,7 +106,7 @@ checkCollision = function(new, existing, overwrite) {
 key2fn = function(opts, key) {
   file.path(opts$path, sprintf("%s.%s", key, opts$extension))
 }
+
 fn2key = function(opts, fn) {
   sub(sprintf("\\.%s$", opts$extension), "", fn)
 }
-

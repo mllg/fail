@@ -9,7 +9,7 @@ print.fail = function(x, ...) {
       sprintf("  %-9s : %s", "cache", opts$cache),
       sprintf("  %-9s : %s", "overwrite", opts$overwrite),
       sprintf("  %-9s : %s", "functions", collapse(names(x), ", ")),
-      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fail$", "", methods(class="fail")), ", ")),
+      sprintf("  %-9s : %s", "methods", collapse(sub("\\.fail$", "", methods(class = "fail")), ", ")),
       sep = "\n")
 }
 

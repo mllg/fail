@@ -54,6 +54,10 @@
 #'       Return a named list of \code{keys}. \code{keys} defaults to all keys available.
 #'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
 #'    }
+#'    \item{\code{assign(keys, envir=parent.frame(), cache)}}{
+#'       Assigns all objects listed in \code{keys} in the environment \code{envir}.
+#'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'    }
 #'    \item{\code{clear(keys)}}{
 #'       Clear the cache to free memory. \code{keys} defaults to all keys available.
 #'    }
@@ -77,10 +81,10 @@
 #' @export
 #' @examples
 #' # initialize a FAIL in a temporary directory
-#' files = fail(tempfile(""))
+#' files <- fail(tempfile(""))
 #'
 #' # save x and y, vectors of random numbers
-#' x = runif(100)
+#' x <- runif(100)
 #' files$put(x, y = runif(100))
 #'
 #' # save columns of the iris data set as separate files
@@ -100,14 +104,14 @@
 #' files$size()
 #'
 #' # get an object and cache it
-#' files$get("x", cache=TRUE)
+#' files$get("x", cache = TRUE)
 #' files$cached()
 #' files$clear()
 #' files$cached()
-fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
+fail = function(path=getwd(), extension = "RData", cache = FALSE, overwrite = TRUE) {
   # Internal functions frequently used, w/o argument checks
-  Ls = function(pattern=NULL) {
-    keys = fn2key(.opts, list.files(.opts$path, pattern=sprintf("\\.%s$", .opts$extension)))
+  Ls = function(pattern = NULL) {
+    keys = fn2key(.opts, list.files(.opts$path, pattern = sprintf("\\.%s$", .opts$extension)))
     if (!is.null(pattern))
       keys = keys[grepl(pattern, keys)]
     keys
@@ -124,15 +128,15 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
     .cache$get(key)
   }
 
-  Put = function(x, cache=.opts$cache) {
+  Put = function(x, cache = .opts$cache) {
     if (!length(x))
       return(invisible(character(0L)))
     keys = names(x)
 
     if (cache)
-      mapply(.cache$put, key=keys, value=x, USE.NAMES=FALSE, SIMPLIFY=FALSE)
+      mapply(.cache$put, key = keys, value = x, USE.NAMES = FALSE, SIMPLIFY = FALSE)
 
-    invisible(mapply(simpleSave, fn=key2fn(.opts, keys), key=keys, value=x, USE.NAMES=FALSE))
+    invisible(mapply(simpleSave, fn = key2fn(.opts, keys), key = keys, value = x, USE.NAMES = FALSE))
   }
 
   # Argument checking and initilization
@@ -140,12 +144,14 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
   assert.string(extension)
 
   if (file.exists(path)) {
-    if (!file_test("-d", path))
+    if (!isDirectory(path))
       stopf("Path '%s' is present but not a directory", path)
-    if (file.access(path, mode = 4L) != 0L)
-      stopf("Path '%s' is not readable", path)
-    if (file.access(path, mode = 2L) != 0L)
-      stopf("Path '%s' is not writeable", path)
+    if (!grepl("windows", Sys.info()["sysname"], ignore.case = TRUE)) {
+      if (file.access(path, mode = 4L) != 0L)
+        stopf("Path '%s' is not readable", path)
+      if (file.access(path, mode = 2L) != 0L)
+        stopf("Path '%s' is not writeable", path)
+    }
   } else {
     if (!dir.create(path))
       stopf("Could not create directory '%s'", path)
@@ -168,14 +174,14 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
              collapse(basename(key2fn(.opts, Ls())), sep = ", "))
 
   setClasses(list(
-    ls = function(pattern=NULL) {
+    ls = function(pattern = NULL) {
       if (!is.null(pattern))
         assert.string(pattern)
       Ls(pattern)
     },
 
     get = function(key, cache = .opts$cache) {
-      Get(as.keys(key, len=1L), as.flag(cache))
+      Get(as.keys(key, len = 1L), as.flag(cache))
     },
 
     put = function(..., li = list(), keys, overwrite = .opts$overwrite, cache = .opts$cache) {
@@ -203,11 +209,10 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       if (anyDuplicated(keys))
         stopf("Argument 'keys' contains duplicated name: %s", head(keys[duplicated(keys)], 1L))
 
-      overwrite = as.flag(overwrite)
-      cache = as.flag(cache)
-      checkCollision(keys, Ls(), overwrite)
+      checkCollision(keys, Ls(), as.flag(overwrite))
 
-      invisible(c(Put(args, cache=cache), Put(li, cache=cache)))
+      cache = as.flag(cache)
+      invisible(c(Put(args, cache = cache), Put(li, cache = cache)))
     },
 
     remove = function(keys) {
@@ -227,41 +232,40 @@ fail = function(path=getwd(), extension="RData", cache=FALSE, overwrite=TRUE) {
       invisible(setNames(ok, keys))
     },
 
-
-    apply = function(FUN, ..., keys, cache=.opts$cache, simplify=FALSE, use.names=TRUE) {
+    apply = function(FUN, ..., keys, cache = .opts$cache, simplify = FALSE, use.names = TRUE) {
       FUN = match.fun(FUN)
       keys = as.keys(keys, default = Ls())
 
       wrapper = function(key, cache, ...) {
-        res = try(FUN(Get(key, cache=cache), ...), silent=TRUE)
+        res = try(FUN(Get(key, cache = cache), ...), silent = TRUE)
         if (is.error(res))
           stopf("Error applying function on key '%s': %s", key, as.character(res))
         res
       }
 
-      sapply(keys, wrapper, cache=as.flag(cache), ..., USE.NAMES=as.flag(use.names), simplify=as.flag(simplify))
+      sapply(keys, wrapper, cache = as.flag(cache), ..., USE.NAMES = as.flag(use.names), simplify = as.flag(simplify))
     },
 
-    size = function(keys, unit="b") {
-      keys = if (missing(keys)) Ls() else as.keys(keys)
-      match.arg(unit, choices=c("b", "Kb", "Mb", "Gb"))
+    size = function(keys, unit = "b") {
+      keys = as.keys(keys, default = Ls())
+      conv = setNames(c(1L, 1024L, 1048576L, 1073741824L), c("b", "kB", "Mb", "Gb"))
+      match.arg(unit, choices = names(conv))
 
       size = as.integer(file.info(key2fn(.opts, keys))$size)
-      setNames(size / switch(unit, "b"=1L, "Kb"=1024L, "Mb"=1048576L, "Gb"=1073741824L), keys)
+      setNames(size / conv[unit], keys)
     },
 
     as.list = function(keys, cache = .opts$cache) {
-      keys = if (missing(keys)) Ls() else  as.keys(keys)
-      setNames(lapply(keys, Get, cache = isTRUE(cache)), keys)
+      keys = as.keys(keys, default = Ls())
+      setNames(lapply(keys, Get, cache = as.flag(cache)), keys)
     },
 
-    assign = function(keys, envir = parent.frame()) {
+    assign = function(keys, envir = parent.frame(), cache = .opts$cache) {
+      keys = as.keys(keys, default = Ls())
+      cache = as.flag(cache)
       force(envir)
-      keys = if (missing(keys)) Ls() else as.keys(keys)
 
-      for (key in keys) {
-        assign(key, Get(key), envir = envir)
-      }
+      lapply(keys, function(key, ee) assign(key, Get(key, cache = cache), envir = ee), ee = envir)
       invisible(TRUE)
     },
 

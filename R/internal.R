@@ -20,7 +20,7 @@ ifail = function(path, extension) {
 
   list(
     ls = function() {
-      fn2key(list.files(.opts$path, pattern = sprintf("\\.%s$", .opts$extension)))
+      fn2key(list.files(path, pattern = sprintf("\\.%s$", extension)))
     },
 
     get = function(key, use.cache = FALSE) {

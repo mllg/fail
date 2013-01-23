@@ -119,7 +119,7 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
   ### clean up
   rm(path, extension, use.cache)
 
-  setClass(list(
+  setClasses(list(
     ls = function(pattern = NULL) {
       keys = .fail$ls()
       if (!is.null(pattern))
@@ -132,7 +132,8 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
     },
 
     as.list = function(keys, use.cache = .use.cache) {
-      setNames(lapply(as.keys(keys, default = .fail$ls()), .fail$get, use.cache = as.flag(use.cache)), keys)
+      keys = as.keys(keys, default = .fail$ls())
+      setNames(lapply(keys, .fail$get, use.cache = as.flag(use.cache)), keys)
     },
 
     put = function(..., li = list(), use.cache = .use.cache) {
@@ -143,7 +144,8 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
       if (anyDuplicated(keys) > 0L)
         stop("Duplicated key names")
 
-      mapply(.fail$put, key = keys, value = args, MoreArgs = list(use.cache = as.flag(use.cache)))
+      mapply(.fail$put, key = keys, value = args, MoreArgs = list(use.cache = as.flag(use.cache)), USE.NAMES=FALSE, SIMPLIFY=FALSE)
+      keys
     },
 
     remove = function(keys) {
@@ -163,7 +165,7 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
         res
       }
 
-      sapply(as.keys(keys), wrapper, .use.cache = as.flag(.use.cache), ...,
+      sapply(as.keys(keys, default = .fail$ls()), wrapper, .use.cache = as.flag(.use.cache), ...,
              USE.NAMES = as.flag(use.names), simplify = as.flag(simplify))
     },
 
@@ -190,181 +192,4 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
       .fail$cache()$keys()
     }
   ), "fail")
-}
-
-if (FALSE) {
-fail = function(path=getwd(), extension = "RData", cache = FALSE, overwrite = TRUE) {
-  # Internal functions frequently used, w/o argument checks
-  Ls = function(pattern = NULL) {
-    keys = fn2key(.opts, list.files(.opts$path, pattern = sprintf("\\.%s$", .opts$extension)))
-    if (!is.null(pattern))
-      keys = keys[grepl(pattern, keys)]
-    keys
-  }
-
-  Get = function(key, cache = .opts$cache) {
-    fn = key2fn(.opts, key)
-    if (!file.exists(fn))
-      stopf("File for key '%s' (%s) not found", key, fn)
-    if (!cache)
-      return(simpleLoad(fn))
-    if (key %nin% .cache$keys())
-      .cache$put(key, simpleLoad(fn))
-    .cache$get(key)
-  }
-
-  Put = function(x, cache = .opts$cache) {
-    if (!length(x))
-      return(invisible(character(0L)))
-    keys = names(x)
-
-    if (cache)
-      mapply(.cache$put, key = keys, value = x, USE.NAMES = FALSE, SIMPLIFY = FALSE)
-
-    invisible(mapply(simpleSave, fn = key2fn(.opts, keys), key = keys, value = x, USE.NAMES = FALSE))
-  }
-
-  # Argument checking and initilization
-  assert.string(path)
-  assert.string(extension)
-
-  if (file.exists(path)) {
-    if (!isDirectory(path))
-      stopf("Path '%s' is present but not a directory", path)
-    if (!grepl("windows", Sys.info()["sysname"], ignore.case = TRUE)) {
-      if (file.access(path, mode = 4L) != 0L)
-        stopf("Path '%s' is not readable", path)
-      if (file.access(path, mode = 2L) != 0L)
-        stopf("Path '%s' is not writeable", path)
-    }
-  } else {
-    if (!dir.create(path))
-      stopf("Could not create directory '%s'", path)
-  }
-
-  if (grepl("[^[:alnum:]]", extension))
-    stop("Extension contains illegal characters: ",
-         collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
-
-  # set up list of options and remove obsolete vars
-  .opts = list(path = normalizePath(path), extension = extension, cache = as.flag(cache), overwrite = as.flag(overwrite))
-  rm(list = names(.opts))
-
-  # initialize cache
-  .cache = Cache()
-
-  # quick sanity check
-  if (anyDuplicated(tolower(Ls())))
-    warningf("The following files would collide on case insensitive file systems: %s",
-             collapse(basename(key2fn(.opts, Ls())), sep = ", "))
-
-  setClasses(list(
-    ls = function(pattern = NULL) {
-      if (!is.null(pattern))
-        assert.string(pattern)
-      Ls(pattern)
-    },
-
-    get = function(key, cache = .opts$cache) {
-      Get(as.keys(key, len = 1L), as.flag(cache))
-    },
-
-    put = function(..., li = list(), keys, overwrite = .opts$overwrite, cache = .opts$cache) {
-      if (!is.list(li))
-        stop("Argument 'li' must be a list")
-      args = argsAsNamedList(...)
-      nargs = length(args) + length(li)
-
-      if (!missing(keys)) {
-        keys = as.keys(keys, len = nargs)
-        names(args) = head(keys, length(args))
-        names(li) = tail(keys, length(li))
-      } else {
-        keys.args = names2(args)
-        if (any(is.na(keys.args)))
-          stop("Could not determine all names from '...' arguments. Consider using key=value syntax")
-
-        keys.li = names2(li)
-        if (any(is.na(keys.li)))
-          stop("Argument 'li' must be a fully named list")
-
-        keys = as.keys(c(keys.args, keys.li))
-      }
-
-      if (anyDuplicated(keys))
-        stopf("Argument 'keys' contains duplicated name: %s", head(keys[duplicated(keys)], 1L))
-
-      checkCollision(keys, Ls(), as.flag(overwrite))
-
-      cache = as.flag(cache)
-      invisible(c(Put(args, cache = cache), Put(li, cache = cache)))
-    },
-
-    remove = function(keys) {
-      keys = unique(as.keys(keys))
-      fns = key2fn(.opts, keys)
-
-      ok = file.exists(fns)
-      if (!all(ok))
-        stopf("Files not found for keys: %s", collapse(keys[!ok]))
-
-      ok = file.remove(fns)
-      if (!all(ok))
-        warningf("Files could not be removed: %s", collapse(fns[!ok], ", "))
-
-      .cache$remove(keys[ok])
-
-      invisible(setNames(ok, keys))
-    },
-
-    apply = function(FUN, ..., keys, cache = .opts$cache, simplify = FALSE, use.names = TRUE) {
-      FUN = match.fun(FUN)
-      keys = as.keys(keys, default = Ls())
-
-      wrapper = function(key, cache, ...) {
-        res = try(FUN(Get(key, cache = cache), ...), silent = TRUE)
-        if (is.error(res))
-          stopf("Error applying function on key '%s': %s", key, as.character(res))
-        res
-      }
-
-      sapply(keys, wrapper, cache = as.flag(cache), ..., USE.NAMES = as.flag(use.names), simplify = as.flag(simplify))
-    },
-
-    size = function(keys, unit = "b") {
-      keys = as.keys(keys, default = Ls())
-      conv = setNames(c(1L, 1024L, 1048576L, 1073741824L), c("b", "kB", "Mb", "Gb"))
-      match.arg(unit, choices = names(conv))
-
-      size = as.integer(file.info(key2fn(.opts, keys))$size)
-      setNames(size / conv[unit], keys)
-    },
-
-    as.list = function(keys, cache = .opts$cache) {
-      keys = as.keys(keys, default = Ls())
-      setNames(lapply(keys, Get, cache = as.flag(cache)), keys)
-    },
-
-    assign = function(keys, envir = parent.frame(), cache = .opts$cache) {
-      keys = as.keys(keys, default = Ls())
-      cache = as.flag(cache)
-      force(envir)
-
-      lapply(keys, function(key, ee) assign(key, Get(key, cache = cache), envir = ee), ee = envir)
-      invisible(TRUE)
-    },
-
-    clear = function(keys) {
-      if (missing(keys)) {
-        .cache$clear()
-      } else {
-        .cache$remove(as.keys(keys))
-      }
-      invisible(TRUE)
-    },
-
-    cached = function() {
-      .cache$keys()
-    }), "fail")
-}
 }

@@ -2,8 +2,8 @@
 \alias{fail}
 \title{Create a file abstraction interface layer (FAIL).}
 \usage{
-  fail(path = getwd(), extension = "RData", cache = FALSE,
-    overwrite = TRUE)
+  fail(path = getwd(), extension = "RData",
+    use.cache = FALSE)
 }
 \arguments{
   \item{path}{[\code{character(1)}]\cr Path to work in,
@@ -76,9 +76,13 @@
   of \code{keys}. \code{keys} defaults to all keys
   available.  Argument \code{cache} can be set to
   temporarily overwrite the global \code{cache} flag.  }
-  \item{\code{clear(keys)}}{ Clear the cache to free
-  memory. \code{keys} defaults to all keys available.  }
-  \item{\code{cached()}}{ Returns a character vector of
+  \item{\code{assign(keys, envir=parent.frame(), cache)}}{
+  Assigns all objects listed in \code{keys} in the
+  environment \code{envir}.  Argument \code{cache} can be
+  set to temporarily overwrite the global \code{cache}
+  flag.  } \item{\code{clear(keys)}}{ Clear the cache to
+  free memory. \code{keys} defaults to all keys available.
+  } \item{\code{cached()}}{ Returns a character vector of
   keys of cached objects.  } \item{\code{size(keys,
   unit="b")}}{ Get the file size in Bytes of the filey
   identified by \code{keys}. \code{keys} defaults to all
@@ -105,10 +109,10 @@
 }
 \examples{
 # initialize a FAIL in a temporary directory
-files = fail(tempfile(""))
+files <- fail(tempfile(""))
 
 # save x and y, vectors of random numbers
-x = runif(100)
+x <- runif(100)
 files$put(x, y = runif(100))
 
 # save columns of the iris data set as separate files
@@ -128,7 +132,7 @@ files$apply(mean)
 files$size()
 
 # get an object and cache it
-files$get("x", cache=TRUE)
+files$get("x", cache = TRUE)
 files$cached()
 files$clear()
 files$cached()

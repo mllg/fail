@@ -36,12 +36,9 @@ test_that("list, get, put", {
   expect_error(f$put(li=list("a - b" = 1)))
   expect_equal(f$put(), character(0L))
 
-  # overwrite protect
-  expect_error(f$put(x=1, overwrite=FALSE))
-
   # cache
   expect_equal(f$cached(), character(0L))
-  f$get("x", cache=TRUE)
+  f$get("x", use.cache=TRUE)
   expect_equal(f$cached(), "x")
   f$clear()
   expect_equal(f$cached(), character(0L))

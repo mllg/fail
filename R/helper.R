@@ -25,29 +25,28 @@ assert.string = function(x, na.ok = FALSE) {
     stopf("Arguments '%s' is NA", deparse(substitute(x)))
 }
 
-as.keys = function(keys, min.len, len, na.ok = FALSE, default) {
+
+
+as.keys = function(keys, len, default) {
   if (missing(keys)) {
     if (missing(default))
-      stop("Argument 'keys' is missing")
+      stop("Keys are missing")
     return(default)
   }
 
   if (!is.character(keys)) {
     keys = try(as.character(keys))
     if (is.error(keys))
-      stop("Argument 'keys' must be of type character or be convertible to character")
+      stop("Keys must be of type character or be convertible to character")
   }
 
   if (!missing(len)) {
     if (length(keys) != len)
-      stop("Argument 'keys' must have length ", len)
-  } else {
-    if (!missing(min.len) && length(keys) <= min.len)
-      stop("Argument 'keys' must have length >=", min.len)
+      stop("Keys must have length ", len)
   }
 
-  if (!na.ok && any(is.na(keys)))
-    stop("Arguments 'keys' contains NAs")
+  if (any(is.na(keys)))
+    stop("Keys contain NAs")
 
   # R variable pattern: "^((\\.[[:alpha:]._]+)|([[:alpha:]]+))[[:alnum:]_.]*$"
   pattern = "^[[:alnum:]._-]+$"
@@ -94,19 +93,43 @@ simpleSave = function(fn, key, value) {
   key
 }
 
-checkCollision = function(new, existing, overwrite) {
-  found.sens = new %in% existing
-  found.insens = !found.sens & new %in% tolower(existing)
-  if (!overwrite && any(found.sens))
-    stopf("File with key '%s' already pesent and overwrite is FALSE", head(new[found.sens], 1L))
-  if (any(found.insens))
-    warningf("Keys with same (case insensitve) name already present: '%s'", collapse(new[found.insens], ", "))
+# checkCollision = function(new, existing, overwrite) {
+#   found.sens = new %in% existing
+#   found.insens = !found.sens & new %in% tolower(existing)
+#   if (!overwrite && any(found.sens))
+#     stopf("File with key '%s' already pesent and overwrite is FALSE", head(new[found.sens], 1L))
+#   if (any(found.insens))
+#     warningf("Keys with same (case insensitve) name already present: '%s'", collapse(new[found.insens], ", "))
+# }
+
+checkPath = function(path) {
+  assert.string(path)
+  if (file.exists(path)) {
+    if (!isDirectory(path))
+      stopf("Path '%s' is present but not a directory", path)
+    if (!grepl("windows", Sys.info()["sysname"], ignore.case = TRUE)) {
+      if (file.access(path, mode = 4L) != 0L)
+        stopf("Path '%s' is not readable", path)
+      if (file.access(path, mode = 2L) != 0L)
+        stopf("Path '%s' is not writeable", path)
+    }
+  } else {
+    if (!dir.create(path))
+      stopf("Could not create directory '%s'", path)
+  }
 }
 
-key2fn = function(opts, key) {
-  file.path(opts$path, sprintf("%s.%s", key, opts$extension))
+checkExtension = function(extension) {
+  assert.string(extension)
+  if (grepl("[^[:alnum:]]", extension))
+    stop("Extension contains illegal characters: ",
+         collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
 }
 
-fn2key = function(opts, fn) {
-  sub(sprintf("\\.%s$", opts$extension), "", fn)
+checkCollision = function(keys) {
+  dups = duplicated(tolower(keys))
+  if (any(dups)) {
+    warningf("The following keys would result in colliding files on case insensitive file systems: %s",
+             collapse(basename(files)))
+  }
 }

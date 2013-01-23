@@ -108,6 +108,91 @@
 #' files$cached()
 #' files$clear()
 #' files$cached()
+fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
+  ### argument checks
+  checkPath(path)
+  checkExtension(extension)
+  .use.cache = as.flag(use.cache)
+  .fail = ifail(path, extension)
+  checkCollision(.fail$ls())
+
+  ### clean up
+  rm(path, extension, use.cache)
+
+  setClass(list(
+    ls = function(pattern = NULL) {
+      keys = .fail$ls()
+      if (!is.null(pattern))
+        keys = keys[grepl(pattern, keys)]
+      keys
+    },
+
+    get = function(key, use.cache = .use.cache) {
+      .fail$get(as.keys(key, len = 1L), as.flag(use.cache))
+    },
+
+    as.list = function(keys, use.cache = .use.cache) {
+      setNames(lapply(as.keys(keys, default = .fail$ls()), .fail$get, use.cache = as.flag(use.cache)), keys)
+    },
+
+    put = function(..., li = list(), use.cache = .use.cache) {
+      args = c(argsAsNamedList(...), as.list(li))
+      keys = names2(args)
+      if (any(is.na(keys)))
+        stop("Could not determine all key names from input")
+      if (anyDuplicated(keys) > 0L)
+        stop("Duplicated key names")
+
+      mapply(.fail$put, key = keys, value = args, MoreArgs = list(use.cache = as.flag(use.cache)))
+    },
+
+    remove = function(keys) {
+      ok = vapply(as.keys(keys), .fail$rm, TRUE)
+      if (!all(ok))
+        warning("Some files could not be removed")
+      ok
+    },
+
+    apply = function(FUN, ..., keys, use.cache = .use.cache, simplify = FALSE, use.names = TRUE) {
+      FUN = match.fun(FUN)
+
+      wrapper = function(key, .use.cache, ...) {
+        res = try(FUN(.fail$get(key, use.cache = .use.cache), ...), silent = TRUE)
+        if (is.error(res))
+          stopf("Error applying function on key '%s': %s", key, as.character(res))
+        res
+      }
+
+      sapply(as.keys(keys), wrapper, .use.cache = as.flag(.use.cache), ...,
+             USE.NAMES = as.flag(use.names), simplify = as.flag(simplify))
+    },
+
+    assign = function(keys, envir = parent.frame(), use.cache = .use.cache) {
+      lapply(as.keys(keys, default = .fail$ls()),
+             function(key, envir) assign(key, .fail$get(key, use.cache = use.cache), envir = envir), envir = envir)
+      invisible(TRUE)
+    },
+
+    size = function(keys, unit = "b") {
+      keys = as.keys(keys, default = .fail$ls())
+      conv = setNames(c(1L, 1024L, 1048576L, 1073741824L), c("b", "kB", "Mb", "Gb"))
+      match.arg(unit, choices = names(conv))
+      setNames(.fail$size(keys) / conv[unit], keys)
+    },
+
+    clear = function(keys) {
+      keys = as.keys(keys, default = .fail$ls())
+      .fail$cache()$remove(keys)
+      invisible(TRUE)
+    },
+
+    cached = function() {
+      .fail$cache()$keys()
+    }
+  ), "fail")
+}
+
+if (FALSE) {
 fail = function(path=getwd(), extension = "RData", cache = FALSE, overwrite = TRUE) {
   # Internal functions frequently used, w/o argument checks
   Ls = function(pattern = NULL) {
@@ -281,4 +366,5 @@ fail = function(path=getwd(), extension = "RData", cache = FALSE, overwrite = TR
     cached = function() {
       .cache$keys()
     }), "fail")
+}
 }

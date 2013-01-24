@@ -24,13 +24,17 @@ ifail = function(path, extension) {
     },
 
     get = function(key, use.cache = FALSE) {
-      if (use.cache && .cache$has_key(key))
-        return(.cache$get(key))
-
       fn = key2fn(key)
       if (!file.exists(fn))
         stopf("File for key '%s' (%s) not found", key, fn)
-      simpleLoad(fn)
+
+      if (use.cache) {
+        if (!.cache$has_key(key))
+          .cache$put(key, simpleLoad(fn))
+        .cache$get(key)
+      } else {
+        simpleLoad(fn)
+      }
     },
 
     put = function(key, value, use.cache = FALSE) {

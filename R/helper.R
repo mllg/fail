@@ -25,8 +25,6 @@ assert.string = function(x, na.ok = FALSE) {
     stopf("Arguments '%s' is NA", deparse(substitute(x)))
 }
 
-
-
 as.keys = function(keys, len, default) {
   if (missing(keys)) {
     if (missing(default))
@@ -130,6 +128,6 @@ checkCollision = function(keys) {
   dups = duplicated(tolower(keys))
   if (any(dups)) {
     warningf("The following keys would result in colliding files on case insensitive file systems: %s",
-             collapse(basename(files)))
+             collapse(keys))
   }
 }

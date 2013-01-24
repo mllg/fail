@@ -132,7 +132,7 @@ files$apply(mean)
 files$size()
 
 # get an object and cache it
-files$get("x", cache = TRUE)
+files$get("x", use.cache = TRUE)
 files$cached()
 files$clear()
 files$cached()

@@ -4,4 +4,5 @@
 #' @importFrom BBmisc %nin%
 #' @importFrom BBmisc is.error
 #' @importFrom BBmisc setClasses
+#' @importFrom BBmisc isDirectory
 NULL

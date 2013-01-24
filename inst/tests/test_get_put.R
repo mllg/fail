@@ -22,7 +22,7 @@ test_that("list, get, put", {
   f$put(1, 2, 3, keys = c("x", "y", "z"))
   expect_equal(f$ls(), c("x", "y", "z"))
   f$remove(f$ls())
-  f$put(1, 2, 3, li = list(foo = 5), keys = c("x", "y", "z", "foo"))
+  f$put(1, 2, 3, li = list(foo = 5), keys = c("x", "y", "z"))
   expect_equal(f$get("x"), 1)
   expect_equal(f$get("foo"), 5)
 

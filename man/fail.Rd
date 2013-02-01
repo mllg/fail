@@ -1,6 +1,6 @@
 \name{fail}
 \alias{fail}
-\title{Create a file abstraction interface layer (FAIL).}
+\title{Create a file abstraction interface layer (FAIL) object.}
 \usage{
   fail(path = getwd(), extension = "RData",
     use.cache = FALSE)
@@ -20,13 +20,15 @@
   Object of class \code{fail}. See Details.
 }
 \description{
-  This is the constructor of a fail object. It provides
-  functions as described in the details. The general idea
-  is to not bother about file path joining or file
-  extensions. Instead, FAIL offers a key-value like
+  The general idea is to not bother about file path joining
+  or file extensions. Instead, FAIL offers a key-value like
   interface to RData files in a specified directory. The
   filename (without extension) acts as the key while the
-  stored R objects are the values.
+  stored R objects are the values. Fail provides an
+  interface to the basic file system actions: listing,
+  reading / loading, writing / saving, removing and
+  applying functions on files. An implemented cache
+  mechanism can be used to avoid repeated disk reads.
 }
 \details{
   For a quick introduction on the usage, see
@@ -83,8 +85,12 @@
   keys available.  Argument \code{unit} accepts \dQuote{b},
   \dQuote{Kb}, \dQuote{Mb} and \dQuote{Gb} and can be used
   to convert Bytes to KiloBytes, MegaBytes or GigaBytes,
-  respectively.  } } Furthermore, the package provides S3
-  methods for \code{\link[base]{print}} and
+  respectively.  } \item{\code{info()}}{ Returns a named
+  list with \code{path}, \code{extension} and
+  \code{use.cache}.  Internally used for the
+  \code{\link[base]{print}} method with a much nicer
+  summary of the FAIL object.  } } Furthermore, the package
+  provides S3 methods for \code{\link[base]{print}} and
   \code{\link[base]{as.list}}.
 
   Be aware of the following restriction regarding file
@@ -94,12 +100,15 @@
   \dQuote{[a-zA-Z0-9._-]} are allowed and should work on
   most or all file systems.  But be careful with key names
   which are not compatible with R's variable naming
-  restrictions, e.g. using the minus character: these can
-  have unwanted side effects.
+  restrictions, e.g. using the minus character or key names
+  starting with a number: these provoke unwanted side
+  effects and will result in errors if used with
+  \code{assign}.
 
   If two files would collide on case-insensitive file
-  systems like Windows' NTFS, the package will throw some
-  warnings.
+  systems like Windows' NTFS, the package will throw
+  warnings. Best practice is to not rely on case
+  sensitivity.
 }
 \examples{
 # initialize a FAIL in a temporary directory
@@ -130,5 +139,9 @@ files$get("x", use.cache = TRUE)
 files$cached()
 files$clear()
 files$cached()
+
+# assign variables in the current environment
+files$assign("y")
+mean(y)
 }
 

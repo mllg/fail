@@ -30,6 +30,8 @@ Put = function(self, ..., keys, li, use.cache) {
   if (anyDuplicated(keys) > 0L)
     stop("Duplicated key names")
 
+  checkCollisionNew(keys, Ls(self))
+
   if (use.cache)
     mapply(self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
 

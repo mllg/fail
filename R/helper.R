@@ -56,7 +56,7 @@ as.keys = function(keys, len, default) {
   pattern = "^[[:alnum:]._-]+$"
   ok = grepl(pattern, keys)
   if (! all(ok))
-    stopf("Key '%s' in illeagal format, see help", head(keys[!ok], 1L))
+    stopf("Key '%s' in illegal format, see help", head(keys[!ok], 1L))
 
   return(keys)
 }
@@ -96,15 +96,6 @@ simpleSave = function(fn, key, value) {
   key
 }
 
-# checkCollision = function(new, existing, overwrite) {
-#   found.sens = new %in% existing
-#   found.insens = !found.sens & new %in% tolower(existing)
-#   if (!overwrite && any(found.sens))
-#     stopf("File with key '%s' already pesent and overwrite is FALSE", head(new[found.sens], 1L))
-#   if (any(found.insens))
-#     warningf("Keys with same (case insensitve) name already present: '%s'", collapse(new[found.insens], ", "))
-# }
-
 checkPath = function(path) {
   assert.string(path)
   if (file.exists(path)) {
@@ -120,6 +111,7 @@ checkPath = function(path) {
     if (!dir.create(path))
       stopf("Could not create directory '%s'", path)
   }
+  path
 }
 
 checkExtension = function(extension) {
@@ -127,20 +119,27 @@ checkExtension = function(extension) {
   if (grepl("[^[:alnum:]]", extension))
     stop("Extension contains illegal characters: ",
          collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
+  extension
 }
 
 checkCollision = function(keys) {
   dups = duplicated(tolower(keys))
   if (any(dups)) {
     warningf("The following keys would result in colliding files on case insensitive file systems: %s",
-             collapse(keys))
+             collapse(keys[dups]))
   }
 }
 
-fn2key = function(opts, fn) {
-  sub(sprintf("\\.%s$", opts$extension), "", fn)
+checkCollisionNew = function(new, old) {
+  dups = new %nin% old & tolower(new) %in% tolower(old)
+  if (any(dups))
+    warningf("Keys would collide on case insensitive file systems: %s", collapse(new[dups]))
 }
 
-key2fn = function(opts, key) {
-  file.path(opts$path, sprintf("%s.%s", key, opts$extension))
+fn2key = function(self, fn) {
+  sub(sprintf("\\.%s$", self$extension), "", fn)
+}
+
+key2fn = function(self, key) {
+  file.path(self$path, sprintf("%s.%s", key, self$extension))
 }

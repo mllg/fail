@@ -68,7 +68,7 @@ Assign = function(self, keys, envir, use.cache) {
     assign(key, Get(self, key, use.cache), envir = envir)
   }
   lapply(keys, w, envir = envir)
-  invisible(TRUE)
+  return(invisible(TRUE))
 }
 
 Size = function(self, keys, unit = "b") {
@@ -78,11 +78,11 @@ Size = function(self, keys, unit = "b") {
 
 Clear = function(self, keys) {
   self$cache$remove(keys)
-  invisible(TRUE)
+  return(invisible(TRUE))
 }
 
 Cached = function(self) {
-  self$cache$keys()
+  return(self$cache$keys())
 }
 
 AsList = function(self, keys, use.cache) {
@@ -90,5 +90,5 @@ AsList = function(self, keys, use.cache) {
 }
 
 Info = function(self) {
-  self[c("path", "extension", "use.cache")]
+  return(self[c("path", "extension", "use.cache")])
 }

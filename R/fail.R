@@ -128,23 +128,28 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
       Ls(self, pattern)
     },
     get = function(key, use.cache) {
-      Get(self, as.keys(key, len = 1L), use.cache = as.flag(use.cache, default = self$use.cache))
+      Get(self, as.keys(key, len = 1L),
+          use.cache = as.flag(use.cache, default = self$use.cache))
     },
     put = function(..., keys, li = list(), use.cache) {
-      Put(self, ..., keys = keys, li = as.list(li), use.cache = as.flag(use.cache, default = self$use.cache))
+      Put(self, ..., keys = keys, li = as.list(li),
+          use.cache = as.flag(use.cache, default = self$use.cache))
     },
     remove = function(keys) {
       Remove(self, as.keys(keys))
     },
     as.list = function(keys, use.cache) {
-      AsList(self, as.keys(keys, default = Ls(self)), use.cache = as.flag(use.cache, default = self$use.cache))
+      AsList(self, as.keys(keys, default = Ls(self)),
+             use.cache = as.flag(use.cache, default = self$use.cache))
     },
     apply = function(FUN, ..., keys, use.cache, simplify = FALSE, use.names = TRUE) {
-      Apply(self, FUN, ..., keys = as.keys(keys, default = Ls(self)), use.cache = as.flag(use.cache, default = self$use.cache),
+      Apply(self, FUN, ..., keys = as.keys(keys, default = Ls(self)),
+            use.cache = as.flag(use.cache, default = self$use.cache),
             simplify = as.flag(simplify), use.names = as.flag(use.names))
     },
     assign = function(keys, envir = parent.frame(), use.cache) {
-      Assign(self, keys = as.keys(keys, default = Ls(self)), envir = envir, use.cache = as.flag(use.cache, default = self$use.cache))
+      Assign(self, keys = as.keys(keys, default = Ls(self)), envir = as.environment(envir),
+             use.cache = as.flag(use.cache, default = self$use.cache))
     },
     size = function(keys, unit = "b") {
       match.arg(unit, choices = names(UNITCONVERT))

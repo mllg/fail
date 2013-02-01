@@ -14,10 +14,10 @@ as.flag = function(x, default) {
     return(x)
   }
 
-  conv = try(as.logical(x), silent = TRUE)
-  if (is.error(conv) || length(conv) != 1L || is.na(conv))
+  x1 = try(as.logical(x), silent = TRUE)
+  if (is.error(x1) || length(x1) != 1L || is.na(x1))
     stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
-  return(conv)
+  return(x1)
 }
 
 assert.string = function(x, na.ok = FALSE) {
@@ -65,7 +65,7 @@ names2 = function(x) {
   ns = names(x)
   if (is.null(ns))
     return(rep(NA_character_, length(x)))
-  replace(ns, ns == "", NA_character_)
+  return(replace(ns, ns == "", NA_character_))
 }
 
 argsAsNamedList = function(...) {
@@ -76,24 +76,22 @@ argsAsNamedList = function(...) {
     ns.sub = as.character(substitute(deparse(...)))[-1L]
     ns[ns.missing] = ns.sub[ns.missing]
   }
-  setNames(args, replace(ns, ns %in% c("NA", "NULL", ""), NA_character_))
+  return(setNames(args, replace(ns, ns %in% c("NA", "NULL", ""), NA_character_)))
 }
 
 simpleLoad = function(fn) {
   ee = new.env(parent = emptyenv(), hash = FALSE)
   ns = load(fn, envir = ee)
-  if (length(ns) == 1L) {
-    ee[[ns]]
-  } else {
-    as.list(ee)
-  }
+  if (length(ns) == 1L)
+    return(ee[[ns]])
+  return(as.list(ee))
 }
 
 simpleSave = function(fn, key, value) {
   ee = new.env(parent = emptyenv(), hash = FALSE)
   assign(key, value, envir = ee)
   save(list = key, envir = ee, file = fn)
-  key
+  return(key)
 }
 
 checkPath = function(path) {
@@ -111,7 +109,7 @@ checkPath = function(path) {
     if (!dir.create(path))
       stopf("Could not create directory '%s'", path)
   }
-  path
+  return(path)
 }
 
 checkExtension = function(extension) {
@@ -119,7 +117,7 @@ checkExtension = function(extension) {
   if (grepl("[^[:alnum:]]", extension))
     stop("Extension contains illegal characters: ",
          collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
-  extension
+  return(extension)
 }
 
 checkCollision = function(keys) {
@@ -137,9 +135,9 @@ checkCollisionNew = function(new, old) {
 }
 
 fn2key = function(self, fn) {
-  sub(sprintf("\\.%s$", self$extension), "", fn)
+  return(sub(sprintf("\\.%s$", self$extension), "", fn))
 }
 
 key2fn = function(self, key) {
-  file.path(self$path, sprintf("%s.%s", key, self$extension))
+  return(file.path(self$path, sprintf("%s.%s", key, self$extension)))
 }

@@ -1,13 +1,19 @@
-as.flag = function(x) {
-  if (missing(x))
+as.flag = function(x, default) {
+  if (missing(x)) {
+    if (!missing(default))
+      return(default)
     stopf("Argument %s is missing", deparse(substitute(x)))
+  }
+
   if (length(x) != 1L)
     stopf("Argument %s must have length 1", deparse(substitute(x)))
+
   if (is.logical(x)) {
     if (is.na(x))
       stopf("Argument %s may not be NA", deparse(substitute(x)))
     return(x)
   }
+
   conv = try(as.logical(x), silent = TRUE)
   if (is.error(conv) || length(conv) != 1L || is.na(conv))
     stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
@@ -27,9 +33,9 @@ assert.string = function(x, na.ok = FALSE) {
 
 as.keys = function(keys, len, default) {
   if (missing(keys)) {
-    if (missing(default))
-      stop("Keys are missing")
-    return(default)
+    if (!missing(default))
+      return(default)
+    stop("Keys are missing")
   }
 
   if (!is.character(keys)) {
@@ -70,8 +76,7 @@ argsAsNamedList = function(...) {
     ns.sub = as.character(substitute(deparse(...)))[-1L]
     ns[ns.missing] = ns.sub[ns.missing]
   }
-  ns[ns %in% c("NA", "NULL", "")] <- NA_character_
-  setNames(args, ns)
+  setNames(args, replace(ns, ns %in% c("NA", "NULL", ""), NA_character_))
 }
 
 simpleLoad = function(fn) {
@@ -130,4 +135,12 @@ checkCollision = function(keys) {
     warningf("The following keys would result in colliding files on case insensitive file systems: %s",
              collapse(keys))
   }
+}
+
+fn2key = function(opts, fn) {
+  sub(sprintf("\\.%s$", opts$extension), "", fn)
+}
+
+key2fn = function(opts, key) {
+  file.path(opts$path, sprintf("%s.%s", key, opts$extension))
 }

@@ -16,5 +16,6 @@ Collate:
     'helper.R'
     'methods.R'
     'zzz.R'
-    'internal.R'
+    'cache.R'
     'fail.R'
+    'worker.R'

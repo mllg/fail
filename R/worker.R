@@ -1,0 +1,92 @@
+Ls = function(self, pattern = NULL) {
+  keys = fn2key(self, list.files(self$path, pattern = sprintf("\\.%s$", self$extension)))
+  if (!is.null(pattern))
+    keys = keys[grepl(pattern, keys)]
+  return(keys)
+}
+
+Get = function(self, key, use.cache) {
+  fn = key2fn(self, key)
+  if (!file.exists(fn))
+    stopf("File for key '%s' (%s) not found", key, fn)
+
+  if (use.cache) {
+    if (!self$cache$has_key(key))
+      self$cache$put(key, simpleLoad(fn))
+    return(self$cache$get(key))
+  }
+  return(simpleLoad(fn))
+}
+
+Put = function(self, ..., keys, li, use.cache) {
+  args = argsAsNamedList(...)
+  if (missing(keys))
+    keys = names2(args)
+  keys = c(as.keys(keys, len = length(args)), as.keys(names2(li)))
+  args = c(args, as.list(li))
+
+  if (any(is.na(keys)))
+    stop("Could not determine all key names from input")
+  if (anyDuplicated(keys) > 0L)
+    stop("Duplicated key names")
+
+  if (use.cache)
+    mapply(self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+
+  mapply(simpleSave, fn = key2fn(self, keys), key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+  invisible(keys)
+}
+
+Remove = function(self, keys) {
+  w = function(key) {
+    self$cache$remove(key)
+    fn = key2fn(self, key)
+    return(file.exists(fn) && file.remove(fn))
+  }
+  ok = vapply(keys, w, logical(1L))
+  if (!all(ok))
+    warningf("Files not removed: %s", collapse(keys[!ok]))
+  return(invisible(ok))
+}
+
+Apply = function(self, FUN, ..., keys, use.cache, simplify, use.names) {
+  wrapper = function(key, ...) {
+    res = try(FUN(Get(self, key, use.cache = use.cache), ...), silent = TRUE)
+    if (is.error(res))
+      stopf("Error applying function on key '%s': %s", key, as.character(res))
+    return(res)
+  }
+
+  FUN = match.fun(FUN)
+  return(sapply(keys, wrapper, ..., USE.NAMES = use.names, simplify = simplify))
+}
+
+Assign = function(self, keys, envir, use.cache) {
+  w = function(key, envir) {
+    assign(key, Get(self, key, use.cache), envir = envir)
+  }
+  lapply(keys, w, envir = envir)
+  invisible(TRUE)
+}
+
+Size = function(self, keys, unit = "b") {
+  size = as.integer(file.info(key2fn(self, keys))$size)
+  setNames(size / UNITCONVERT[unit], keys)
+}
+
+Clear = function(self, keys) {
+  self$cache$remove(keys)
+  invisible(TRUE)
+}
+
+Cached = function(self) {
+  self$cache$keys()
+}
+
+AsList = function(self, keys, use.cache) {
+  setNames(lapply(keys, Get, self = self, use.cache = use.cache), keys)
+}
+
+Info = function(self) {
+  self[c("path", "extension", "use.cache")]
+}

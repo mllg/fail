@@ -12,11 +12,8 @@
 #'   Path to work in, will be created if it does not exists.
 #' @param extension [\code{character(1)}]\cr
 #'   File extension to work with.
-#' @param cache [\code{logical(1)}]\cr
-#'   Use a memory cache as global default.
-#'   Global option which can locally be overwritten in most functions.
-#' @param overwrite [\code{logical(1)}]\cr
-#'   Protect files from being accidently overwritten.
+#' @param use.cache [\code{logical(1)}]\cr
+#'   Use a memory cache per global default.
 #'   Global option which can locally be overwritten in most functions.
 #' @return Object of class \code{fail}. See Details.
 #' @details
@@ -27,36 +24,36 @@
 #'     \item{\code{ls(pattern=NULL)}}{
 #'       Function to list keys in directory \code{path} matching a regular expression pattern \code{pattern}.
 #'     }
-#'     \item{\code{get(key, cache)}}{
+#'     \item{\code{get(key, use.cache)}}{
 #'       Function to load a file identified by \code{key} from directory \code{path}.
-#'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
 #'     }
-#'     \item{\code{put(..., li, keys, overwrite, cache)}}{
+#'     \item{\code{put(..., li, keys, use.cache)}}{
 #'       Function to save objects to to directory \code{path}.
 #'       Names for objects provided via \code{...} will be looked up or can be provided using a \code{key = value} syntax.
 #'       More objects can be passed as a named list using the argument \code{li}: Each list item will be saved to a separate file.
 #'       If you provide \code{keys} as a character vector, these keys will be taken instead.
 #'       The vector than must be of length \code{length(...) + length(li)}. The first keys will be used to name objects in \code{...},
 #'       the remaining to name objects in \code{li}.
-#'       Arguments \code{overwrite} and \code{cache} temporarily overwrite the global \code{overwrite} or \code{cache} flags, respectively.
+#'       Argument \code{use.cache} temporarily overwrites the global \code{use.cache} flags, respectively.
 #'     }
 #'     \item{\code{remove(keys)}}{
 #'       Function to remove files identified by \code{keys} from directory \code{path}.
 #'     }
-#'     \item{\code{apply(FUN, ..., keys, cache, simplify=FALSE, use.names=TRUE)}}{
+#'     \item{\code{apply(FUN, ..., keys, use.cache, simplify=FALSE, use.names=TRUE)}}{
 #'       Apply a function \code{FUN} on files identified by \code{keys}. The loaded R objects will be past unnamed as first argument.
 #'       Use \code{...} for additional function arguments.
-#'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
 #'       For arguments \code{simplify} and \code{use.names}, see \code{\link{lapply}}.
 #'       Keys will be used to name the (possibly simplified) returned list.
 #'    }
-#'    \item{\code{as.list(keys, cache)}}{
+#'    \item{\code{as.list(keys, use.cache)}}{
 #'       Return a named list of \code{keys}. \code{keys} defaults to all keys available.
-#'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
 #'    }
-#'    \item{\code{assign(keys, envir=parent.frame(), cache)}}{
+#'    \item{\code{assign(keys, envir=parent.frame(), use.cache)}}{
 #'       Assigns all objects listed in \code{keys} in the environment \code{envir}.
-#'       Argument \code{cache} can be set to temporarily overwrite the global \code{cache} flag.
+#'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
 #'    }
 #'    \item{\code{clear(keys)}}{
 #'       Clear the cache to free memory. \code{keys} defaults to all keys available.
@@ -112,86 +109,45 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
   ### argument checks
   checkPath(path)
   checkExtension(extension)
-  .use.cache = as.flag(use.cache)
-  .fail = ifail(path, extension)
-  checkCollision(.fail$ls())
-
-  ### clean up
+  use.cache = as.flag(use.cache)
+  self = list(path = path, extension = extension, use.cache = use.cache, cache = Cache())
   rm(path, extension, use.cache)
 
   setClasses(list(
     ls = function(pattern = NULL) {
-      keys = .fail$ls()
-      if (!is.null(pattern))
-        keys = keys[grepl(pattern, keys)]
-      keys
+      Ls(self, pattern)
     },
-
-    get = function(key, use.cache = .use.cache) {
-      .fail$get(as.keys(key, len = 1L), as.flag(use.cache))
+    get = function(key, use.cache) {
+      Get(self, as.keys(key, len = 1L), use.cache = as.flag(use.cache, default = self$use.cache))
     },
-
-    as.list = function(keys, use.cache = .use.cache) {
-      keys = as.keys(keys, default = .fail$ls())
-      setNames(lapply(keys, .fail$get, use.cache = as.flag(use.cache)), keys)
+    put = function(..., keys, li = list(), use.cache) {
+      Put(self, ..., keys = keys, li = as.list(li), use.cache = as.flag(use.cache, default = self$use.cache))
     },
-
-    put = function(..., keys, li = list(), use.cache = .use.cache) {
-      args = argsAsNamedList(...)
-      keys = c(as.keys(keys, len = length(args), default = names2(args)), as.keys(names2(li)))
-      args = c(args, as.list(li))
-
-      if (any(is.na(keys)))
-        stop("Could not determine all key names from input")
-      if (anyDuplicated(keys) > 0L)
-        stop("Duplicated key names")
-
-      mapply(.fail$put, key = keys, value = args, MoreArgs = list(use.cache = as.flag(use.cache)), USE.NAMES=FALSE, SIMPLIFY=FALSE)
-      invisible(keys)
-    },
-
     remove = function(keys) {
-      ok = vapply(as.keys(keys), .fail$rm, TRUE)
-      if (!all(ok))
-        warningf("Files not removed: %s", collapse(keys[!ok]))
-      invisible(ok)
+      Remove(self, as.keys(keys))
     },
-
-    apply = function(FUN, ..., keys, use.cache = .use.cache, simplify = FALSE, use.names = TRUE) {
-      FUN = match.fun(FUN)
-
-      wrapper = function(key, .use.cache, ...) {
-        res = try(FUN(.fail$get(key, use.cache = .use.cache), ...), silent = TRUE)
-        if (is.error(res))
-          stopf("Error applying function on key '%s': %s", key, as.character(res))
-        res
-      }
-
-      sapply(as.keys(keys, default = .fail$ls()), wrapper, .use.cache = as.flag(.use.cache), ...,
-             USE.NAMES = as.flag(use.names), simplify = as.flag(simplify))
+    as.list = function(keys, use.cache) {
+      AsList(self, as.keys(keys, default = Ls(self)), use.cache = as.flag(use.cache, default = self$use.cache))
     },
-
-    assign = function(keys, envir = parent.frame(), use.cache = .use.cache) {
-      lapply(as.keys(keys, default = .fail$ls()),
-             function(key, envir) assign(key, .fail$get(key, use.cache = use.cache), envir = envir), envir = envir)
-      invisible(TRUE)
+    apply = function(FUN, ..., keys, use.cache, simplify = FALSE, use.names = TRUE) {
+      Apply(self, FUN, ..., keys = as.keys(keys, default = Ls(self)), use.cache = as.flag(use.cache, default = self$use.cache),
+            simplify = as.flag(simplify), use.names = as.flag(use.names))
     },
-
+    assign = function(keys, envir = parent.frame(), use.cache) {
+      Assign(self, keys = as.keys(keys, default = Ls(self)), envir = envir, use.cache = as.flag(use.cache, default = self$use.cache))
+    },
     size = function(keys, unit = "b") {
-      keys = as.keys(keys, default = .fail$ls())
-      conv = setNames(c(1L, 1024L, 1048576L, 1073741824L), c("b", "kB", "Mb", "Gb"))
-      match.arg(unit, choices = names(conv))
-      setNames(.fail$size(keys) / conv[unit], keys)
+      match.arg(unit, choices = names(UNITCONVERT))
+      Size(self, as.keys(keys, default = Ls(self)), unit = unit)
     },
-
     clear = function(keys) {
-      keys = as.keys(keys, default = .fail$ls())
-      .fail$cache()$remove(keys)
-      invisible(TRUE)
+      Clear(self, as.keys(keys, default = Ls(self)))
     },
-
     cached = function() {
-      .fail$cache()$keys()
+      Cached(self)
+    },
+    info = function() {
+      Info(self)
     }
   ), "fail")
 }

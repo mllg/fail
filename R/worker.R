@@ -11,7 +11,7 @@ Get = function(self, key, use.cache) {
     stopf("File for key '%s' (%s) not found", key, fn)
 
   if (use.cache) {
-    if (!self$cache$has_key(key))
+    if (!self$cache$exists(key))
       self$cache$put(key, simpleLoad(fn))
     return(self$cache$get(key))
   }
@@ -34,6 +34,8 @@ Put = function(self, ..., keys, li, use.cache) {
 
   if (use.cache)
     mapply(self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+  else
+    self$cache$rm(keys)
 
   mapply(simpleSave, fn = key2fn(self, keys), key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
   invisible(keys)
@@ -41,7 +43,7 @@ Put = function(self, ..., keys, li, use.cache) {
 
 Remove = function(self, keys) {
   w = function(key) {
-    self$cache$remove(key)
+    self$cache$rm(key)
     fn = key2fn(self, key)
     return(file.exists(fn) && file.remove(fn))
   }
@@ -77,7 +79,7 @@ Size = function(self, keys, unit = "b") {
 }
 
 Clear = function(self, keys) {
-  self$cache$remove(keys)
+  self$cache$rm(keys)
   return(invisible(TRUE))
 }
 

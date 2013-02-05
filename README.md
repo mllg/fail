@@ -90,7 +90,7 @@ results$as.list(keys)
 results$as.list() # or as.list(results)
 
 # read all files quickly into a list as one-liner
-results = as.list(fail("results"))
+as.list(fail("results"))
 
 # assign two variables into the current environment
 results$assign(c("result_a_01", "result_a_02"))
@@ -130,7 +130,7 @@ You can provide some keys (default is all keys) and the provided function `FUN` 
 `use.names` defaults to `TRUE`. The function returns a named (possibly simplified) list with keys as list names.
 The advantage over manually applying a function with `sapply` is the iterative approach: the complete list containing all objects is not created to keep memory consumption low.
 
-Sometimes the functionality of `lapply` does not suffice. 
+Sometimes the functionality of `lapply` does not suffice.
 Therefore the package also ships with a version of `mapply` as `mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE)`.
 The provided function `FUN` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
 
@@ -145,7 +145,7 @@ sapply(as.list(results), mean)
 scaled = fail(tempfile())
 scaled$put(li = results$apply(scale)) # memory inefficient
 results$mapply(function(key, value) scaled$put(scale(value), keys = key)) # memory efficent
-
+scaled$ls()
 ```
 
 ### More utility functions
@@ -155,12 +155,12 @@ If you are missing some important ones, please contact me.
 
 ```splus
 # show file size informations
-results$size(unit="Kb")
+results$size(unit="kB")
 
 # enable caching (can be switched on globally)
 library(microbenchmark)
 results$put(a = rnorm(100000))
-microbenchmark(results$get("a"), results$get("a", cache=TRUE))
+microbenchmark(results$get("a"), results$get("a", use.cache=TRUE))
 
 # simple cache control
 results$cached()

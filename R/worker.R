@@ -54,15 +54,30 @@ Remove = function(self, keys) {
 }
 
 Apply = function(self, FUN, ..., keys, use.cache, simplify, use.names) {
-  wrapper = function(key, ...) {
-    res = try(FUN(Get(self, key, use.cache = use.cache), ...), silent = TRUE)
+  wrapper = function(.key, ...) {
+    res = try(FUN(Get(self, .key, use.cache = use.cache), ...), silent = TRUE)
     if (is.error(res))
-      stopf("Error applying function on key '%s': %s", key, as.character(res))
+      stopf("Error applying function on key '%s': %s", .key, as.character(res))
     return(res)
   }
 
   FUN = match.fun(FUN)
   return(sapply(keys, wrapper, ..., USE.NAMES = use.names, simplify = simplify))
+}
+
+Mapply = function(self, FUN, ..., keys, use.cache, moreArgs, simplify, use.names) {
+  wrapper = function(.key, ...) {
+    res = try(FUN(key = .key, value = Get(self, .key, use.cache = use.cache), ...), silent = TRUE)
+    if (is.error(res))
+      stopf("Error applying function on key '%s': %s", .key, as.character(res))
+    return(res)
+  }
+
+  FUN = match.fun(FUN)
+  if (!all(c("key", "value") %in% names(formals(FUN))))
+    stop("Function must have formal arguments 'key' and 'value'")
+
+  return(mapply(wrapper, .key = keys, ..., MoreArgs = moreArgs, USE.NAMES = use.names, SIMPLIFY = simplify))
 }
 
 Assign = function(self, keys, envir, use.cache) {

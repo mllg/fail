@@ -1,13 +1,13 @@
 # fail
 
-File Abstraction Interface Layer (FAIL) for R mimicking a key-value store.
+File Abstraction Interface Layer (FAIL) for R, mimicking a key-value store.
 
 This package simplifies working with RData files managed in directories.
-A FAIL is constructed on a single directory and provides the following functionality:
- 
+A FAIL operates non-recursively on a single directory and provides the following functionality:
+
 * Internal handling of path joining.
-* List "keys" (filename without RData-extension) or subsets of keys by providing a regular expression.
-* Create, load, save and remove R object using a key-value syntax.
+* List "keys" (filename without RData-extension) or subsets of keys by providing regular expressions.
+* Create, load, save and remove R objects using a key-value syntax.
 * Efficient apply functions on all files or on subsets.
 * Flexible in-memory caching mechanism to avoid reading files multiple times.
 
@@ -30,14 +30,15 @@ library(fail)
 
 ### Example files
 
-For illustration we use a directory with multiple (result) files in it. You can create one in your current working directory by using the following small snippet. The next examples rely on them, so if you want to try FAIL out, better do this now.
+For illustration we create a directory with multiple (result) files in it.
+You can create one in your current working directory by using the following small snippet. All next examples rely on them, so you better do this now.
 
 ```splus
 path = file.path(getwd(), "results")
 dir.create(path)
 for (i in 1:10) {
     for (j in 1:10) {
-        x = rnorm(100) 
+        x = rnorm(100)
         save(x, file = file.path(path, sprintf("result_%s_%02i.RData", letters[i], j)))
     }
 }
@@ -46,17 +47,20 @@ list.files(path)
 
 ### Initialization
 
-A FAIL is constructed with the `fail` function. You can specify the path to work on (defaults to the current working directory), the file extension (default: "RData"), and two logical flags:  a in-memory cache (default `FALSE`) and overwrite protection (default `FALSE`). The latter two can be switched locally in related functions and act more as a "global" default to save you some typing.
+A FAIL is constructed with the `fail` function.
+You can specify the path to work on (defaults to the current working directory), the file extension (default: "RData"), and a logical flag to enable or disable the caching mechanism per default (default: `FALSE`).
 
 ```splus
 # initialize a FAIL on the previously created directory
+library(fail)
 results = fail("results")
 print(results)
 ```
 
 ### Listing files
 
-The path and further options are saved internally so everything you need to do is calling the `ls(pattern=NULL)` subfunction of the created object. The return value is always a character vector containing the keys (filenames without extension).
+The path and further options are saved internally so everything you need to do is calling the `ls(pattern=NULL)` subfunction of the created object.
+The return value is always a character vector containing the keys (filenames without extension).
 
 ```splus
 results$ls()
@@ -65,16 +69,21 @@ results$ls()
 results$ls("^result_a")
 ```
 
-### Loading R objects
+### Retrieving R objects
 
-FAIL provides two retrieval subfunctions: `get(key, cache)` and `as.list(keys, cache)`. `get` is handy to retrieve a single object by its key while `as.list` aims at loading multiple files into a named list. The `cache` argument defaults to the value specified in the constructor. If `cache` is set to `TRUE`, the objects will be stored in a memory cache which avoids loading the related files multiple times.
+FAIL provides two retrieval subfunctions: `get(key, use.cache)` and `as.list(keys, use.cache)`.
+`get` is handy to retrieve a single object by its key while `as.list` loads multiple files into a named list.
+The `use.cache` argument defaults to the value specified in the constructor.
+If `use.cache` is set to `TRUE`, the objects will be stored in memory so that multiple calls to `get` or `as.list` do not cause multiple disk reads.
+
+Furthermore the subfunction `assign(keys, envir, use.cache)` assigns objects to a provided environment `envir` which defaults to the current.
 
 ```splus
 # single object
-results$get("_a_")
+results$get("result_a_01")
 
 # multiple objects
-keys = results$ls("_a_") 
+keys = results$ls("_a_")
 results$as.list(keys)
 
 # all objects
@@ -82,18 +91,26 @@ results$as.list() # or as.list(results)
 
 # read all files quickly into a list as one-liner
 results = as.list(fail("results"))
+
+# assign two variables into the current environment
+results$assign(c("result_a_01", "result_a_02"))
+mean(result_a_01)
 ```
 
 ### Saving R objects
 
-The subfunction `put(..., li=list(), overwrite, cache)` stores all objects provided in the previously specified directory. You can pass arguments in a `key=vale` way or just use predefined variables (the variable names will then be looked up. You can furthermore pass a named list to `li` (see example). Again, the global flags `overwrite` and `cache` can be overwritten locally.
+The subfunction `put(..., keys, li=list(), use.cache)` stores all objects provided to the directory specified in the constructor.
+You can pass arguments in a `key=vale` syntax or just use predefined variables (the variable names will then be looked up).
+You can furthermore pass a named list to `li` (see example).
+The argument `keys` can be used to overwrite the names for the objects passed via `...` which is useful in some scenarios, e.g. together with `do.call`.
+Again, the global flag `use.cache` can be overwritten locally.
 
 ```splus
 # add two files "foo.RData" and "bar.RData"
 foo = 1
 results$put(foo, bar = 2)
 
-# you can also provide a named list, each item will be saved in a separate file
+# provide a named list, each item will be saved in a separate file
 results$put(li = list(foo = 1, bar = 2))
 ```
 
@@ -103,24 +120,36 @@ Of course you can also remove files. The subfunction `rm(keys)` takes a characte
 
 ```splus
 results$remove("foo")
-results$remove(results.ls("ar"))
+results$remove(results$ls("ar")) # matches bar
 ```
 
 ### Applying functions over R objects
 
-The typical R way to work with literally everything (because loops are ... kinda slow) is to apply functions over vectors or lists. The subfunction `apply(FUN, ..., keys, cache, simplify, use.names)` acts in  principle like a `sapply` (but has more sane defaults, because the error prone simplify is per default off). You can provide some keys (default is all keys) and the provided function `FUN` is applied iteratively on the related objects stored on the file system (or in the cache, respectively). `use.names` is per default `TRUE` and the function returns a named (possibly simplified) list with keys as list names.
+The subfunction `apply(FUN, ..., keys, cache, simplify, use.names)` acts in  principle like a `sapply` (but has more sane defaults, because the error prone simplify is per default off).
+You can provide some keys (default is all keys) and the provided function `FUN` is applied on the objects stored on the file system (or in the cache).
+`use.names` defaults to `TRUE`. The function returns a named (possibly simplified) list with keys as list names.
+The advantage over manually applying a function with `sapply` is the iterative approach: the complete list containing all objects is not created to keep memory consumption low.
+Sometimes the functionality of `lapply` does not suffice. Therefore the package also ships with a version of `mapply`.
+The subfunction `mapply` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
 
 ```splus
 # memory optimized lapply-like function
-results$apply(mean, keys=results$ls("_a_"), simplify=TRUE)
+results$apply(mean, simplify=TRUE)
 
-# the same, but the list of all files will be created first
+# identical, but the list of all objects will be created first
 sapply(as.list(results), mean)
+
+# map function scale and store results (in a temporary directory)
+scaled = fail(tempfile())
+scaled$put(li = results$apply(scale)) # memory inefficient
+results$mapply(function(key, value) scaled$put(scale(value), keys = key))
+
 ```
 
 ### More utility functions
 
-The next snippet teases some more (for most users not that important) utility functions. If you are missing some important ones, contact me.
+The next snippet teases some more (for most users not that important) utility functions.
+If you are missing some important ones, please contact me.
 
 ```splus
 # show file size informations
@@ -135,11 +164,4 @@ microbenchmark(results$get("a"), results$get("a", cache=TRUE))
 results$cached()
 results$clear()
 results$cached()
-
-# working with multiple directories (pseudo code)
-# apply my_function_wrapper on all input data and save results in another directory
-# (these kind of transformations might get a memory optimized function in the future)
-input = fail(tempfile())
-results = fail(tempfile())
-results$put(li = input$apply(my_function_wrapper))
 ```

@@ -66,7 +66,19 @@
   \code{use.cache} can be set to temporarily overwrite the
   global \code{use.cache} flag.  For arguments
   \code{simplify} and \code{use.names}, see
-  \code{\link[base]{lapply}}.  } \item{\code{as.list(keys,
+  \code{\link[base]{lapply}}.  } \item{\code{mapply(FUN,
+  ..., keys, use.cache, moreArgs = NULL, simplify=FALSE,
+  use.names=TRUE)}}{ Apply function \code{FUN} on files
+  identified by \code{keys}.  \code{keys} defaults to all
+  keys available and will be used to name the returned
+  list.  The function \code{FUN} must have the formal
+  arguments \dQuote{key} and \dQuote{value}.  Both key and
+  value will be passed named.  Use \code{...} and
+  \code{moreArgs} for additional function arguments.
+  Argument \code{use.cache} can be set to temporarily
+  overwrite the global \code{use.cache} flag.  For
+  arguments \code{simplify} and \code{use.names}, see
+  \code{\link[base]{mapply}}.  } \item{\code{as.list(keys,
   use.cache)}}{ Return a named list of objects identified
   by \code{keys}. \code{keys} defaults to all keys
   available.  Argument \code{use.cache} can be set to

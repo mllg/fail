@@ -46,6 +46,15 @@
 #'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
 #'       For arguments \code{simplify} and \code{use.names}, see \code{\link[base]{lapply}}.
 #'    }
+#'     \item{\code{mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify=FALSE, use.names=TRUE)}}{
+#'       Apply function \code{FUN} on files identified by \code{keys}.
+#'       \code{keys} defaults to all keys available and will be used to name the returned list.
+#'       The function \code{FUN} must have the formal arguments \dQuote{key} and \dQuote{value}.
+#'       Both key and value will be passed named.
+#'       Use \code{...} and/or \code{moreArgs} for additional function arguments.
+#'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
+#'       For arguments \code{moreArgs}, \code{simplify} and \code{use.names}, see \code{\link[base]{mapply}}.
+#'    }
 #'    \item{\code{as.list(keys, use.cache)}}{
 #'       Return a named list of objects identified by \code{keys}. \code{keys} defaults to all keys available.
 #'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
@@ -101,6 +110,7 @@
 #'
 #' # apply a function over files
 #' files$apply(mean)
+#' files$mapply(function(key, value) sprintf("%s -> %f", key, mean(value)), simplify = TRUE)
 #'
 #' # show file size informations
 #' files$size()
@@ -146,6 +156,11 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
       Apply(self, FUN, ..., keys = as.keys(keys, default = Ls(self)),
             use.cache = as.flag(use.cache, default = self$use.cache),
             simplify = as.flag(simplify), use.names = as.flag(use.names))
+    },
+    mapply = function(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE) {
+      Mapply(self, FUN, ..., keys = as.keys(keys, default = Ls(self)),
+             use.cache = as.flag(use.cache, default = self$use.cache),
+             moreArgs = as.list(moreArgs), simplify = as.flag(simplify), use.names = as.flag(use.names))
     },
     assign = function(keys, envir = parent.frame(), use.cache) {
       Assign(self, keys = as.keys(keys, default = Ls(self)), envir = as.environment(envir),

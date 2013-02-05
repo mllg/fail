@@ -131,7 +131,7 @@ You can provide some keys (default is all keys) and the provided function `FUN` 
 The advantage over manually applying a function with `sapply` is the iterative approach: the complete list containing all objects is not created to keep memory consumption low.
 
 Sometimes the functionality of `lapply` does not suffice. 
-Therefore the package also ships with a version of `mapply` as `mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE)'.
+Therefore the package also ships with a version of `mapply` as `mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE)`.
 The provided function `FUN` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
 
 ```splus
@@ -144,7 +144,7 @@ sapply(as.list(results), mean)
 # map function scale and store results (in a temporary directory)
 scaled = fail(tempfile())
 scaled$put(li = results$apply(scale)) # memory inefficient
-results$mapply(function(key, value) scaled$put(scale(value), keys = key))
+results$mapply(function(key, value) scaled$put(scale(value), keys = key)) # memory efficent
 
 ```
 

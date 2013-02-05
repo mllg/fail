@@ -47,7 +47,7 @@ list.files(path)
 
 ### Initialization
 
-A FAIL is constructed with the `fail` function.
+A FAIL is constructed with the `fail` function: `fail(path = getwd(), extension = ".RData", use.cache = FALSE)`.
 You can specify the path to work on (defaults to the current working directory), the file extension (default: "RData"), and a logical flag to enable or disable the caching mechanism per default (default: `FALSE`).
 
 ```splus
@@ -125,12 +125,14 @@ results$remove(results$ls("ar")) # matches bar
 
 ### Applying functions over R objects
 
-The subfunction `apply(FUN, ..., keys, cache, simplify, use.names)` acts in  principle like a `sapply` (but has more sane defaults, because the error prone simplify is per default off).
+The subfunction `apply(FUN, ..., keys, cache, simplify = FALSE, use.names = TRUE)` acts in  principle like a `sapply` (but has more sane defaults, because the error prone simplify is per default off).
 You can provide some keys (default is all keys) and the provided function `FUN` is applied on the objects stored on the file system (or in the cache).
 `use.names` defaults to `TRUE`. The function returns a named (possibly simplified) list with keys as list names.
 The advantage over manually applying a function with `sapply` is the iterative approach: the complete list containing all objects is not created to keep memory consumption low.
-Sometimes the functionality of `lapply` does not suffice. Therefore the package also ships with a version of `mapply`.
-The subfunction `mapply` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
+
+Sometimes the functionality of `lapply` does not suffice. 
+Therefore the package also ships with a version of `mapply` as `mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE)'.
+The provided function `FUN` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
 
 ```splus
 # memory optimized lapply-like function

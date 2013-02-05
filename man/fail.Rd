@@ -73,36 +73,37 @@
   keys available and will be used to name the returned
   list.  The function \code{FUN} must have the formal
   arguments \dQuote{key} and \dQuote{value}.  Both key and
-  value will be passed named.  Use \code{...} and
+  value will be passed named.  Use \code{...} and/or
   \code{moreArgs} for additional function arguments.
   Argument \code{use.cache} can be set to temporarily
   overwrite the global \code{use.cache} flag.  For
-  arguments \code{simplify} and \code{use.names}, see
-  \code{\link[base]{mapply}}.  } \item{\code{as.list(keys,
-  use.cache)}}{ Return a named list of objects identified
-  by \code{keys}. \code{keys} defaults to all keys
-  available.  Argument \code{use.cache} can be set to
-  temporarily overwrite the global \code{use.cache} flag.
-  } \item{\code{assign(keys, envir=parent.frame(),
-  use.cache)}}{ Assigns all objects identified by the
-  character vector \code{keys} in the environment
-  \code{envir}.  Argument \code{use.cache} can be set to
-  temporarily overwrite the global \code{use.cache} flag.
-  } \item{\code{clear(keys)}}{ Clear the cache to free
-  memory. \code{keys} defaults to all keys available.  }
-  \item{\code{cached()}}{ Returns a character vector of
-  keys of cached objects.  } \item{\code{size(keys,
-  unit="b")}}{ Get the file size in Bytes of the files
-  identified by \code{keys}. \code{keys} defaults to all
-  keys available.  Argument \code{unit} accepts \dQuote{b},
-  \dQuote{Kb}, \dQuote{Mb} and \dQuote{Gb} and can be used
-  to convert Bytes to KiloBytes, MegaBytes or GigaBytes,
-  respectively.  } \item{\code{info()}}{ Returns a named
-  list with \code{path}, \code{extension} and
-  \code{use.cache}.  Internally used for the
-  \code{\link[base]{print}} method with a much nicer
-  summary of the FAIL object.  } } Furthermore, the package
-  provides S3 methods for \code{\link[base]{print}} and
+  arguments \code{moreArgs}, \code{simplify} and
+  \code{use.names}, see \code{\link[base]{mapply}}.  }
+  \item{\code{as.list(keys, use.cache)}}{ Return a named
+  list of objects identified by \code{keys}. \code{keys}
+  defaults to all keys available.  Argument
+  \code{use.cache} can be set to temporarily overwrite the
+  global \code{use.cache} flag.  } \item{\code{assign(keys,
+  envir=parent.frame(), use.cache)}}{ Assigns all objects
+  identified by the character vector \code{keys} in the
+  environment \code{envir}.  Argument \code{use.cache} can
+  be set to temporarily overwrite the global
+  \code{use.cache} flag.  } \item{\code{clear(keys)}}{
+  Clear the cache to free memory. \code{keys} defaults to
+  all keys available.  } \item{\code{cached()}}{ Returns a
+  character vector of keys of cached objects.  }
+  \item{\code{size(keys, unit="b")}}{ Get the file size in
+  Bytes of the files identified by \code{keys}. \code{keys}
+  defaults to all keys available.  Argument \code{unit}
+  accepts \dQuote{b}, \dQuote{Kb}, \dQuote{Mb} and
+  \dQuote{Gb} and can be used to convert Bytes to
+  KiloBytes, MegaBytes or GigaBytes, respectively.  }
+  \item{\code{info()}}{ Returns a named list with
+  \code{path}, \code{extension} and \code{use.cache}.
+  Internally used for the \code{\link[base]{print}} method
+  with a much nicer summary of the FAIL object.  } }
+  Furthermore, the package provides S3 methods for
+  \code{\link[base]{print}} and
   \code{\link[base]{as.list}}.
 
   Be aware of the following restriction regarding file
@@ -142,6 +143,7 @@ files$remove("Species")
 
 # apply a function over files
 files$apply(mean)
+files$mapply(function(key, value) sprintf("\%s -> \%f", key, mean(value)), simplify = TRUE)
 
 # show file size informations
 files$size()

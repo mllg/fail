@@ -1,9 +1,10 @@
-Version 1.1 (2012-12-xx)
+Version 1.1 (2013-02-05)
 -------------------------------------------------------------------------------
 
 * New closure "$assign"
+* New closure "$mapply"
 * New argument in closure "$put": keys
-* More informative error messages
+* Improved error messages
 * Relaxed checks for illegal characters in keys
 
 

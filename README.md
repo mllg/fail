@@ -128,14 +128,14 @@ results$remove(results$ls("ar")) # matches bar
 The subfunction `apply(FUN, ..., keys, cache, simplify = FALSE, use.names = TRUE)` acts in  principle like a `sapply` (but has more sane defaults, because the error prone simplify is per default off).
 You can provide some keys (default is all keys) and the provided function `FUN` is applied on the objects stored on the file system (or in the cache).
 `use.names` defaults to `TRUE`. The function returns a named (possibly simplified) list with keys as list names.
-The advantage over manually applying a function with `sapply` is the iterative approach: the complete list containing all objects is not created to keep memory consumption low.
+The advantage over manually applying a function with `sapply` on a list created by `as.list` is the lower memory consumption: List items are read in and discarded iteratively.
 
 Sometimes the functionality of `lapply` does not suffice.
 Therefore the package also ships with a version of `mapply` as `mapply(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE)`.
 The provided function `FUN` must have the formals `key` and `value` to which the keys and corresponding objects are passed.
 
 ```splus
-# memory optimized lapply-like function
+# memory friendly lapply-like function
 results$apply(mean, simplify=TRUE)
 
 # identical, but the list of all objects will be created first

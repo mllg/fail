@@ -125,7 +125,8 @@
 }
 \examples{
 # initialize a FAIL in a temporary directory
-files <- fail(tempfile(""))
+path <- tempfile("")
+files <- fail(path)
 
 # save x and y, vectors of random numbers
 x <- runif(100)
@@ -134,7 +135,10 @@ files$put(x, y = runif(100))
 # save columns of the iris data set as separate files
 files$put(li = as.list(iris))
 
-# load an object from the file system
+# load all RData files in a named list as a one-liner
+as.list(fail(path))
+
+# load a single object from the file system
 files$get("Species")
 files$as.list(c("x", "y"))
 
@@ -146,7 +150,7 @@ files$apply(mean)
 files$mapply(function(key, value) sprintf("\%s -> \%f", key, mean(value)), simplify = TRUE)
 
 # show file size informations
-files$size()
+files$size(unit = "Mb")
 
 # get an object and cache it
 files$get("x", use.cache = TRUE)

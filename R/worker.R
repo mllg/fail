@@ -1,24 +1,24 @@
-Ls = function(self, pattern = NULL) {
-  keys = fn2key(self, list.files(self$path, pattern = sprintf("\\.%s$", self$extension)))
+Ls = function(.self, pattern = NULL) {
+  keys = fn2key(.self, list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension)))
   if (!is.null(pattern))
     keys = keys[grepl(pattern, keys)]
   return(keys)
 }
 
-Get = function(self, key, use.cache) {
-  fn = key2fn(self, key)
+Get = function(.self, key, use.cache) {
+  fn = key2fn(.self, key)
   if (!file.exists(fn))
     stopf("File for key '%s' (%s) not found", key, fn)
 
   if (use.cache) {
-    if (!self$cache$exists(key))
-      self$cache$put(key, simpleLoad(fn))
-    return(self$cache$get(key))
+    if (!.self$cache$exists(key))
+      .self$cache$put(key, simpleLoad(fn))
+    return(.self$cache$get(key))
   }
   return(simpleLoad(fn))
 }
 
-Put = function(self, ..., keys, li, use.cache) {
+Put = function(.self, ..., keys, li, use.cache) {
   args = argsAsNamedList(...)
   if (missing(keys))
     keys = names2(args)
@@ -30,21 +30,21 @@ Put = function(self, ..., keys, li, use.cache) {
   if (anyDuplicated(keys) > 0L)
     stop("Duplicated key names")
 
-  checkCollisionNew(keys, Ls(self))
+  checkCollisionNew(keys, Ls(.self))
 
   if (use.cache)
-    mapply(self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    mapply(.self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
   else
-    self$cache$rm(keys)
+    .self$cache$rm(keys)
 
-  mapply(simpleSave, fn = key2fn(self, keys), key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+  mapply(simpleSave, fn = key2fn(.self, keys), key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
   invisible(keys)
 }
 
-Remove = function(self, keys) {
+Remove = function(.self, keys) {
   w = function(key) {
-    self$cache$rm(key)
-    fn = key2fn(self, key)
+    .self$cache$rm(key)
+    fn = key2fn(.self, key)
     return(file.exists(fn) && file.remove(fn))
   }
   ok = vapply(keys, w, logical(1L))
@@ -53,9 +53,9 @@ Remove = function(self, keys) {
   return(invisible(ok))
 }
 
-Apply = function(self, FUN, ..., keys, use.cache, simplify, use.names) {
+Apply = function(.self, FUN, ..., keys, use.cache, simplify, use.names) {
   wrapper = function(.key, ...) {
-    res = try(FUN(Get(self, .key, use.cache = use.cache), ...), silent = TRUE)
+    res = try(FUN(Get(.self, .key, use.cache = use.cache), ...), silent = TRUE)
     if (is.error(res))
       stopf("Error applying function on key '%s': %s", .key, as.character(res))
     return(res)
@@ -65,9 +65,9 @@ Apply = function(self, FUN, ..., keys, use.cache, simplify, use.names) {
   return(sapply(keys, wrapper, ..., USE.NAMES = use.names, simplify = simplify))
 }
 
-Mapply = function(self, FUN, ..., keys, use.cache, moreArgs, simplify, use.names) {
+Mapply = function(.self, FUN, ..., keys, use.cache, moreArgs, simplify, use.names) {
   wrapper = function(.key, ...) {
-    res = try(FUN(key = .key, value = Get(self, .key, use.cache = use.cache), ...), silent = TRUE)
+    res = try(FUN(key = .key, value = Get(.self, .key, use.cache = use.cache), ...), silent = TRUE)
     if (is.error(res))
       stopf("Error applying function on key '%s': %s", .key, as.character(res))
     return(res)
@@ -80,32 +80,32 @@ Mapply = function(self, FUN, ..., keys, use.cache, moreArgs, simplify, use.names
   return(mapply(wrapper, .key = keys, ..., MoreArgs = moreArgs, USE.NAMES = use.names, SIMPLIFY = simplify))
 }
 
-Assign = function(self, keys, envir, use.cache) {
+Assign = function(.self, keys, envir, use.cache) {
   w = function(key, envir) {
-    assign(key, Get(self, key, use.cache), envir = envir)
+    assign(key, Get(.self, key, use.cache), envir = envir)
   }
   lapply(keys, w, envir = envir)
   return(invisible(TRUE))
 }
 
-Size = function(self, keys, unit = "b") {
-  size = as.integer(file.info(key2fn(self, keys))$size)
+Size = function(.self, keys, unit = "b") {
+  size = as.integer(file.info(key2fn(.self, keys))$size)
   setNames(size / UNITCONVERT[unit], keys)
 }
 
-Clear = function(self, keys) {
-  self$cache$rm(keys)
+Clear = function(.self, keys) {
+  .self$cache$rm(keys)
   return(invisible(TRUE))
 }
 
-Cached = function(self) {
-  return(self$cache$keys())
+Cached = function(.self) {
+  return(.self$cache$keys())
 }
 
-AsList = function(self, keys, use.cache) {
-  setNames(lapply(keys, Get, self = self, use.cache = use.cache), keys)
+AsList = function(.self, keys, use.cache) {
+  setNames(lapply(keys, Get, .self = .self, use.cache = use.cache), keys)
 }
 
-Info = function(self) {
-  return(self[c("path", "extension", "use.cache")])
+Info = function(.self) {
+  return(.self[c("path", "extension", "use.cache")])
 }

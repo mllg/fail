@@ -94,8 +94,7 @@ Size = function(.self, keys, unit = "b") {
 }
 
 Clear = function(.self, keys) {
-  .self$cache$rm(keys)
-  return(invisible(TRUE))
+  return(invisible(.self$cache$rm(keys)))
 }
 
 Cached = function(.self) {

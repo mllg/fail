@@ -85,7 +85,7 @@ Assign = function(.self, keys, envir, use.cache) {
     assign(key, Get(.self, key, use.cache), envir = envir)
   }
   lapply(keys, w, envir = envir)
-  return(invisible(TRUE))
+  return(invisible(keys))
 }
 
 Size = function(.self, keys, unit = "b") {

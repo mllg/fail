@@ -133,6 +133,7 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE) {
   .self = list(path = checkPath(path),
                extension = checkExtension(extension),
                use.cache = as.flag(use.cache),
+               src = FALSE,
                cache = Cache())
   rm(path, extension, use.cache)
   checkCollision(Ls(.self))

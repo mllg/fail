@@ -19,3 +19,4 @@ Collate:
     'cache.R'
     'fail.R'
     'worker.R'
+    'sail.R'

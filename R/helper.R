@@ -61,11 +61,16 @@ as.keys = function(keys, len, default) {
   return(keys)
 }
 
-simpleLoad = function(fn) {
-  ee = new.env(parent = emptyenv(), hash = FALSE)
-  ns = load(fn, envir = ee)
-  if (length(ns) == 1L)
-    return(ee[[ns]])
+simpleLoad = function(fn, src=FALSE) {
+  ee = new.env(parent = if(src) .GlobalEnv else emptyenv(), hash = FALSE)
+  if (src) {
+    sys.source(fn, ee)
+    ns = ls(ee)
+  } else {
+    ns = load(fn, envir = ee)
+    if (length(ns) == 1L)
+      return(ee[[ns]])
+  }
   return(as.list(ee))
 }
 
@@ -122,4 +127,10 @@ fn2key = function(.self, fn) {
 
 key2fn = function(.self, key) {
   return(file.path(.self$path, sprintf("%s.%s", key, .self$extension)))
+}
+
+coalesce = function(x, replacement) {
+  if (is.null(x))
+    return(replacement)
+  return(x)
 }

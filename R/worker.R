@@ -12,10 +12,10 @@ Get = function(.self, key, use.cache) {
 
   if (use.cache) {
     if (!.self$cache$exists(key))
-      .self$cache$put(key, simpleLoad(fn))
+      .self$cache$put(key, simpleLoad(fn, src = .self$src))
     return(.self$cache$get(key))
   }
-  return(simpleLoad(fn))
+  return(simpleLoad(fn, src = .self$src))
 }
 
 Put = function(.self, ..., keys, li, use.cache) {
@@ -82,7 +82,11 @@ Mapply = function(.self, FUN, ..., keys, use.cache, moreArgs, simplify, use.name
 
 Assign = function(.self, keys, envir, use.cache) {
   w = function(key, envir) {
-    assign(key, Get(.self, key, use.cache), envir = envir)
+    x = Get(.self, key, use.cache)
+    if (.self$src)
+      mapply(assign, names(x), x, MoreArgs = list(envir = envir), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+    else
+      assign(key, x, envir = envir)
   }
   lapply(keys, w, envir = envir)
   return(invisible(keys))

@@ -3,7 +3,7 @@
 \title{Create a file abstraction interface layer (FAIL) object.}
 \usage{
   fail(path = getwd(), extension = "RData",
-    use.cache = FALSE)
+    use.cache = FALSE, simplify = TRUE)
 }
 \arguments{
   \item{path}{[\code{character(1)}]\cr Path to work in,

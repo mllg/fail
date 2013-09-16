@@ -9,9 +9,15 @@
 #'   Global option which can locally be overwritten in most functions.
 #' @return Object of class \code{fail}. See Details.
 #' @export
-sail = function(path = getwd(), extension = "R", use.cache = FALSE) {
-  s = fail(path, extension, use.cache)
-  ee = environment(s$ls)
-  ee$.self$src = TRUE
-  return(s)
+sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE) {
+  .self = list(path = checkPath(path),
+               extension = checkExtension(extension),
+               use.cache = as.flag(use.cache),
+               simplify = as.flag(simplify, na.ok = TRUE),
+               cache = Cache(),
+               loadFun = loadR, 
+               saveFun = saveR
+               )
+  checkCollision(Ls(.self))
+  setClasses(makeObject(.self), "fail")
 }

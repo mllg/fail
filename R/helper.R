@@ -1,4 +1,4 @@
-as.flag = function(x, default) {
+as.flag = function(x, default, na.ok = FALSE) {
   if (missing(x)) {
     if (!missing(default))
       return(default)
@@ -9,13 +9,13 @@ as.flag = function(x, default) {
     stopf("Argument %s must have length 1", deparse(substitute(x)))
 
   if (is.logical(x)) {
-    if (is.na(x))
+    if (!na.ok && is.na(x))
       stopf("Argument %s may not be NA", deparse(substitute(x)))
     return(x)
   }
 
   x1 = try(as.logical(x), silent = TRUE)
-  if (is.error(x1) || length(x1) != 1L || is.na(x1))
+  if (is.error(x1) || length(x1) != 1L || (!na.ok && is.na(x1)))
     stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
   return(x1)
 }
@@ -59,26 +59,6 @@ as.keys = function(keys, len, default) {
     stopf("Key '%s' in illegal format, see help", head(keys[!ok], 1L))
 
   return(keys)
-}
-
-simpleLoad = function(fn, src=FALSE) {
-  ee = new.env(parent = if(src) .GlobalEnv else emptyenv(), hash = FALSE)
-  if (src) {
-    sys.source(fn, ee)
-    ns = ls(ee)
-  } else {
-    ns = load(fn, envir = ee)
-    if (length(ns) == 1L)
-      return(ee[[ns]])
-  }
-  return(as.list(ee))
-}
-
-simpleSave = function(fn, key, value) {
-  ee = new.env(parent = emptyenv(), hash = FALSE)
-  assign(key, value, envir = ee)
-  save(list = key, envir = ee, file = fn)
-  return(key)
 }
 
 checkPath = function(path) {

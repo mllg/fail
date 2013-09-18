@@ -1,6 +1,5 @@
 context("as.list")
 
-
 test_that("as.list", {
   path = tempfile()
   f = fail(path)

@@ -110,5 +110,5 @@ AsList = function(.self, keys, use.cache) {
 }
 
 Info = function(.self) {
-  return(.self[c("path", "extension", "use.cache")])
+  return(.self[c("path", "extension", "use.cache", "simplify")])
 }

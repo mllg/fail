@@ -1,6 +1,5 @@
 context("size")
 
-
 test_that("size", {
   path = tempfile()
   f = fail(path)

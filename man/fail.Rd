@@ -10,14 +10,21 @@
   will be created if it does not exists.}
 
   \item{extension}{[\code{character(1)}]\cr File extension
-  to work with.}
+  to work with.  Default is \dQuote{RData}.}
 
   \item{use.cache}{[\code{logical(1)}]\cr Use a memory
   cache per global default.  Global option which can
-  locally be overwritten in most functions.}
+  locally be overwritten in most functions.  Default is
+  \code{FALSE}}
+
+  \item{simplify}{[\code{character(1)}]\cr If only one
+  object is stored in a R data file, should the return
+  value be simplified?  If set to \code{TRUE}, instead of a
+  list containing one element the object itself will be
+  returned instead.}
 }
 \value{
-  Object of class \code{fail}. See Details.
+  Object of class \code{fail}. See details.
 }
 \description{
   The general idea is to not bother about file path joining
@@ -37,28 +44,31 @@
   An object with the following functions is returned by
   \code{fail}: \describe{ \item{\code{ls(pattern=NULL)}}{
   Function to list keys in directory \code{path} matching a
-  regular expression pattern \code{pattern}.  }
-  \item{\code{get(key, use.cache)}}{ Function to load a
-  file identified by \code{key} from directory \code{path}.
-  To load many objects at once, use \code{as.list},
-  \code{assign} or \code{get} together with
-  \code{\link[base]{lapply}}.  Argument \code{use.cache}
-  can be set to temporarily overwrite the global
-  \code{use.cache} flag.  } \item{\code{put(..., li, keys,
-  use.cache)}}{ Function to save objects to directory
-  \code{path}.  Names for objects provided via \code{...}
-  will be looked up or can be provided using a \code{key =
-  value} syntax.  More objects can be passed as a named
-  list using the argument \code{li}: Each list item will be
-  saved to a separate file.  If you provide \code{keys} as
-  a character vector, these names will be taken for the
-  arguments passed via \code{...}.  Argument
-  \code{use.cache} temporarily overwrites the global
-  \code{use.cache} flag.  } \item{\code{remove(keys)}}{
-  Function to remove files identified by \code{keys} from
-  directory \code{path}.  } \item{\code{apply(FUN, ...,
-  keys, use.cache, simplify=FALSE, use.names=TRUE)}}{ Apply
-  function \code{FUN} on files identified by \code{keys}.
+  regular expression pattern \code{pattern}.  Returns a
+  character vector of keys.  } \item{\code{get(key,
+  use.cache)}}{ Function to load a file identified by
+  \code{key} from directory \code{path}.  To load many
+  objects at once, use \code{as.list}, \code{assign} or
+  \code{get} together with \code{\link[base]{lapply}}.
+  Argument \code{use.cache} can be set to temporarily
+  overwrite the global \code{use.cache} flag.  }
+  \item{\code{put(..., li, keys, use.cache)}}{ Function to
+  save objects to directory \code{path}.  Names for objects
+  provided via \code{...} will be looked up or can be
+  provided using a \code{key = value} syntax.  More objects
+  can be passed as a named list using the argument
+  \code{li}: Each list item will be saved to a separate
+  file.  If you provide \code{keys} as a character vector,
+  these names will be taken for the arguments passed via
+  \code{...}.  Argument \code{use.cache} temporarily
+  overwrites the global \code{use.cache} flag.  Returns a
+  character vector of stored keys.  }
+  \item{\code{remove(keys)}}{ Function to remove files
+  identified by \code{keys} from directory \code{path}.
+  Returns a character vector of deleted keys.  }
+  \item{\code{apply(FUN, ..., keys, use.cache,
+  simplify=FALSE, use.names=TRUE)}}{ Apply function
+  \code{FUN} on files identified by \code{keys}.
   \code{keys} defaults to all keys available and will be
   used to name the returned list.  The loaded R objects
   will be past unnamed as first argument.  Use \code{...}
@@ -88,22 +98,23 @@
   identified by the character vector \code{keys} in the
   environment \code{envir}.  Argument \code{use.cache} can
   be set to temporarily overwrite the global
-  \code{use.cache} flag.  } \item{\code{clear(keys)}}{
-  Clear the cache to free memory. \code{keys} defaults to
-  all keys available.  } \item{\code{cached()}}{ Returns a
-  character vector of keys of cached objects.  }
-  \item{\code{size(keys, unit="b")}}{ Get the file size in
-  Bytes of the files identified by \code{keys}. \code{keys}
-  defaults to all keys available.  Argument \code{unit}
-  accepts \dQuote{b}, \dQuote{Kb}, \dQuote{Mb} and
-  \dQuote{Gb} and can be used to convert Bytes to
-  KiloBytes, MegaBytes or GigaBytes, respectively.  }
-  \item{\code{info()}}{ Returns a named list with
-  \code{path}, \code{extension} and \code{use.cache}.
-  Internally used for the \code{\link[base]{print}} method
-  with a much nicer summary of the FAIL object.  } }
-  Furthermore, the package provides S3 methods for
-  \code{\link[base]{print}} and
+  \code{use.cache} flag.  Returns a character vector of
+  assigned keys.  } \item{\code{clear(keys)}}{ Clear the
+  cache to free memory. \code{keys} defaults to all keys
+  available.  Returns a character vector of cleared keys.
+  } \item{\code{cached()}}{ Returns a character vector of
+  keys of cached objects.  } \item{\code{size(keys,
+  unit="b")}}{ Get the file size in Bytes of the files
+  identified by \code{keys}. \code{keys} defaults to all
+  keys available.  Argument \code{unit} accepts \dQuote{b},
+  \dQuote{Kb}, \dQuote{Mb} and \dQuote{Gb} and can be used
+  to convert Bytes to KiloBytes, MegaBytes or GigaBytes,
+  respectively.  } \item{\code{info()}}{ Returns a named
+  list with \code{path}, \code{extension} and
+  \code{use.cache}.  Internally used for the
+  \code{\link[base]{print}} method with a much nicer
+  summary of the FAIL object.  } } Furthermore, the package
+  provides S3 methods for \code{\link[base]{print}} and
   \code{\link[base]{as.list}}.
 
   Be aware of the following restriction regarding file

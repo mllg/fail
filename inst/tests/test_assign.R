@@ -1,6 +1,5 @@
 context("assign")
 
-
 test_that("assign", {
   path = tempfile()
   f = fail(path)

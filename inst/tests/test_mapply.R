@@ -1,6 +1,5 @@
 context("mapply")
 
-
 test_that("mapply", {
   path = tempfile()
   f = fail(path)

@@ -16,6 +16,9 @@ saveRData = function(fn, key, value) {
 loadR = function(fn, simplify = FALSE) {
   ee = new.env(parent = .GlobalEnv, hash = FALSE)
   sys.source(fn, ee)
+  ns = ls(ee, all.names = TRUE)
+  if (simplify && length(ns) == 1L)
+    return(ee[[ns]])
   return(as.list(ee))
 }
 

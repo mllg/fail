@@ -11,10 +11,17 @@
 #'   Path to work in, will be created if it does not exists.
 #' @param extension [\code{character(1)}]\cr
 #'   File extension to work with.
+#'   Default is \dQuote{RData}.
 #' @param use.cache [\code{logical(1)}]\cr
 #'   Use a memory cache per global default.
 #'   Global option which can locally be overwritten in most functions.
-#' @return Object of class \code{fail}. See Details.
+#'   Default is \code{FALSE}
+#' @param simplify [\code{character(1)}]\cr
+#'   If only one object is stored in a R data file,
+#'   should the return value be simplified? 
+#'    If set to \code{TRUE},
+#'   instead of a list containing one element the object itself will be returned instead.
+#' @return Object of class \code{fail}. See details.
 #' @details
 #'   For a quick introduction on the usage, see \url{https://github.com/mllg/fail}.
 #'
@@ -22,6 +29,7 @@
 #'   \describe{
 #'     \item{\code{ls(pattern=NULL)}}{
 #'       Function to list keys in directory \code{path} matching a regular expression pattern \code{pattern}.
+#'       Returns a character vector of keys.
 #'     }
 #'     \item{\code{get(key, use.cache)}}{
 #'       Function to load a file identified by \code{key} from directory \code{path}.
@@ -34,9 +42,11 @@
 #'       More objects can be passed as a named list using the argument \code{li}: Each list item will be saved to a separate file.
 #'       If you provide \code{keys} as a character vector, these names will be taken for the arguments passed via \code{...}.
 #'       Argument \code{use.cache} temporarily overwrites the global \code{use.cache} flag.
+#'       Returns a character vector of stored keys.
 #'     }
 #'     \item{\code{remove(keys)}}{
 #'       Function to remove files identified by \code{keys} from directory \code{path}.
+#'       Returns a character vector of deleted keys.
 #'     }
 #'     \item{\code{apply(FUN, ..., keys, use.cache, simplify=FALSE, use.names=TRUE)}}{
 #'       Apply function \code{FUN} on files identified by \code{keys}.
@@ -62,9 +72,11 @@
 #'    \item{\code{assign(keys, envir=parent.frame(), use.cache)}}{
 #'       Assigns all objects identified by the character vector \code{keys} in the environment \code{envir}.
 #'       Argument \code{use.cache} can be set to temporarily overwrite the global \code{use.cache} flag.
+#'       Returns a character vector of assigned keys.
 #'    }
 #'    \item{\code{clear(keys)}}{
 #'       Clear the cache to free memory. \code{keys} defaults to all keys available.
+#'       Returns a character vector of cleared keys.
 #'    }
 #'    \item{\code{cached()}}{
 #'       Returns a character vector of keys of cached objects.

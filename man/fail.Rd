@@ -21,7 +21,7 @@
   object is stored in a R data file, should the return
   value be simplified?  If set to \code{TRUE}, instead of a
   list containing one element the object itself will be
-  returned instead.}
+  returned.}
 }
 \value{
   Object of class \code{fail}. See details.

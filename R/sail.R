@@ -16,7 +16,7 @@
 #' @param simplify [\code{character(1)}]\cr
 #'   If only one object is defined in a sourced R file,
 #'   should the return value be simplified? If set to \code{TRUE},
-#'   instead of a list containing one element the object itself will be returned instead.
+#'   instead of a list containing one element the object itself will be returned.
 #' @return Object of class \code{sail}. See the documentation of \code{\link{fail}}
 #'   for details.
 #' @export

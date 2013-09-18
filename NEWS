@@ -1,7 +1,10 @@
-Version 1.2 (2013-xx-xx)
+Version 1.2 (2013-09-18)
 -------------------------------------------------------------------------------
+* New argument "simplify" to enforce lists to be returned
+* New object "sail" to access R source files
 * Closure "$assign" now returns keys of assigned objects
 * Closure "$clear" now returns keys of cleared objects
+
 
 Version 1.1 (2013-02-05)
 -------------------------------------------------------------------------------

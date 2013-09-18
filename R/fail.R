@@ -19,8 +19,8 @@
 #' @param simplify [\code{character(1)}]\cr
 #'   If only one object is stored in a R data file,
 #'   should the return value be simplified? 
-#'    If set to \code{TRUE},
-#'   instead of a list containing one element the object itself will be returned instead.
+#'   If set to \code{TRUE},
+#'   instead of a list containing one element the object itself will be returned.
 #' @return Object of class \code{fail}. See details.
 #' @details
 #'   For a quick introduction on the usage, see \url{https://github.com/mllg/fail}.

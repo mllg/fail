@@ -1,5 +1,5 @@
 Ls = function(.self, pattern = NULL) {
-  keys = fn2key(.self, list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension)))
+  keys = fn2key(.self, list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case=TRUE))
   if (!is.null(pattern))
     keys = keys[grepl(pattern, keys)]
   return(keys)

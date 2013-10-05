@@ -108,9 +108,3 @@ fn2key = function(.self, fn) {
 key2fn = function(.self, key) {
   return(file.path(.self$path, sprintf("%s.%s", key, .self$extension)))
 }
-
-coalesce = function(x, replacement) {
-  if (is.null(x))
-    return(replacement)
-  return(x)
-}

@@ -27,7 +27,7 @@ Put = function(.self, ..., keys, li, use.cache) {
 
   if (any(is.na(keys)))
     stop("Could not determine all key names from input")
-  if (anyDuplicated(keys) > 0L)
+  if (anyDuplicated(keys))
     stop("Duplicated key names")
 
   checkCollisionNew(keys, Ls(.self))
@@ -47,7 +47,7 @@ Remove = function(.self, keys) {
     fn = key2fn(.self, key)
     return(file.exists(fn) && file.remove(fn))
   }
-  ok = vapply(keys, w, logical(1L))
+  ok = vlapply(keys, w)
   if (!all(ok))
     warningf("Files not removed: %s", collapse(keys[!ok]))
   return(invisible(ok))

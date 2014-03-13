@@ -29,6 +29,7 @@ assert.string = function(x, na.ok = FALSE) {
     stopf("Argument '%s' must have length 1", deparse(substitute(x)))
   if (!na.ok && is.na(x))
     stopf("Arguments '%s' is NA", deparse(substitute(x)))
+  invisible(TRUE)
 }
 
 as.keys = function(keys, len, default) {
@@ -93,12 +94,14 @@ checkCollision = function(keys) {
     warningf("The following keys result in colliding files on case insensitive file systems: %s",
              collapse(keys[dups]))
   }
+  invisible(TRUE)
 }
 
 checkCollisionNew = function(new, old) {
   dups = new %nin% old & tolower(new) %in% tolower(old)
   if (any(dups))
     warningf("Keys collide on case insensitive file systems: %s", collapse(new[dups]))
+  invisible(TRUE)
 }
 
 fn2key = function(.self, fn) {

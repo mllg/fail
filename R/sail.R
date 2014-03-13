@@ -1,7 +1,7 @@
 #' Create a source abstraction interface layer (SAIL) object.
 #'
-#' This function returns an object of class \code{sail} which behaves 
-#' like \code{\link{fail}}, but is indented for loading and saving 
+#' This function returns an object of class \code{sail} which behaves
+#' like \code{\link{fail}}, but is indented for loading and saving
 #' R source code files.
 #'
 #' @param path [\code{character(1)}]\cr
@@ -26,7 +26,7 @@ sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = T
                use.cache = as.flag(use.cache),
                simplify = as.flag(simplify, na.ok = TRUE),
                cache = Cache(),
-               loadFun = loadR, 
+               loadFun = loadR,
                saveFun = saveR
                )
   checkCollision(Ls(.self))

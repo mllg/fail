@@ -2,8 +2,8 @@
 \alias{sail}
 \title{Create a source abstraction interface layer (SAIL) object.}
 \usage{
-  sail(path = getwd(), extension = "R", use.cache = FALSE,
-    simplify = TRUE)
+sail(path = getwd(), extension = "R", use.cache = FALSE,
+  simplify = TRUE)
 }
 \arguments{
   \item{path}{[\code{character(1)}]\cr Path to work in,
@@ -24,12 +24,12 @@
   returned.}
 }
 \value{
-  Object of class \code{sail}. See the documentation of
-  \code{\link{fail}} for details.
+Object of class \code{sail}. See the documentation of
+\code{\link{fail}} for details.
 }
 \description{
-  This function returns an object of class \code{sail}
-  which behaves like \code{\link{fail}}, but is indented
-  for loading and saving R source code files.
+This function returns an object of class \code{sail} which
+behaves like \code{\link{fail}}, but is indented for
+loading and saving R source code files.
 }
 

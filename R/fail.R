@@ -18,7 +18,7 @@
 #'   Default is \code{FALSE}
 #' @param simplify [\code{character(1)}]\cr
 #'   If only one object is stored in a R data file,
-#'   should the return value be simplified? 
+#'   should the return value be simplified?
 #'   If set to \code{TRUE},
 #'   instead of a list containing one element the object itself will be returned.
 #' @return Object of class \code{fail}. See details.
@@ -147,7 +147,7 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE, simplify
                use.cache = as.flag(use.cache),
                simplify = as.flag(simplify, na.ok = TRUE),
                cache = Cache(),
-               loadFun = loadRData, 
+               loadFun = loadRData,
                saveFun = saveRData
                )
   checkCollision(Ls(.self))

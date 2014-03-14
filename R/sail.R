@@ -23,8 +23,8 @@
 sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE) {
   .self = list(path = checkPath(path),
                extension = checkExtension(extension),
-               use.cache = as.flag(use.cache),
-               simplify = as.flag(simplify, na.ok = TRUE),
+               use.cache = asFlag(use.cache),
+               simplify = asFlag(simplify, na.ok = TRUE),
                cache = Cache(),
                loadFun = loadR,
                saveFun = saveR

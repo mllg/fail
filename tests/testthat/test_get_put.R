@@ -17,6 +17,11 @@ test_that("list, get, put", {
   y = setNames(as.list(1:5), letters[1:5])
   expect_equal(x, y)
 
+  # positional arguments
+  expect_equal(f$pos(), 1)
+  expect_equal(f$pos(2), 2)
+  expect_equal(f$pos(6), NULL)
+
   path = tempfile()
   f = fail(path)
   f$put(1, 2, 3, keys = c("x", "y", "z"))

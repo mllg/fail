@@ -144,8 +144,8 @@ fail = function(path = getwd(), extension = "RData", use.cache = FALSE, simplify
   ### argument checks
   .self = list(path = checkPath(path),
                extension = checkExtension(extension),
-               use.cache = as.flag(use.cache),
-               simplify = as.flag(simplify, na.ok = TRUE),
+               use.cache = asFlag(use.cache),
+               simplify = asFlag(simplify, na.ok = TRUE),
                cache = Cache(),
                loadFun = loadRData,
                saveFun = saveRData

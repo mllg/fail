@@ -22,7 +22,7 @@ Put = function(.self, ..., keys, li, use.cache) {
   args = argsAsNamedList(...)
   if (missing(keys))
     keys = names2(args)
-  keys = c(as.keys(keys, len = length(args)), as.keys(names2(li)))
+  keys = c(asKeys(keys, len = length(args)), asKeys(names2(li)))
   args = c(args, as.list(li))
 
   if (any(is.na(keys)))

@@ -1,4 +1,4 @@
-as.flag = function(x, default, na.ok = FALSE) {
+asFlag = function(x, default, na.ok = FALSE) {
   if (missing(x)) {
     if (!missing(default))
       return(default)
@@ -20,7 +20,7 @@ as.flag = function(x, default, na.ok = FALSE) {
   return(x1)
 }
 
-assert.string = function(x, na.ok = FALSE) {
+assertString = function(x, na.ok = FALSE) {
   if (missing(x))
     stopf("Argument '%s' is missing", deparse(substitute(x)))
   if (!is.character(x))
@@ -32,7 +32,7 @@ assert.string = function(x, na.ok = FALSE) {
   invisible(TRUE)
 }
 
-as.keys = function(keys, len, default) {
+asKeys = function(keys, len, default) {
   if (missing(keys)) {
     if (!missing(default))
       return(default)
@@ -63,7 +63,7 @@ as.keys = function(keys, len, default) {
 }
 
 checkPath = function(path) {
-  assert.string(path)
+  assertString(path)
   if (file.exists(path)) {
     if (!isDirectory(path))
       stopf("Path '%s' is present but not a directory", path)
@@ -81,7 +81,7 @@ checkPath = function(path) {
 }
 
 checkExtension = function(extension) {
-  assert.string(extension)
+  assertString(extension)
   if (grepl("[^[:alnum:]]", extension))
     stop("Extension contains illegal characters: ",
          collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
@@ -110,4 +110,8 @@ fn2key = function(.self, fn) {
 
 key2fn = function(.self, key) {
   return(file.path(.self$path, sprintf("%s.%s", key, .self$extension)))
+}
+
+nkeys = function(.self) {
+  length(list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case=TRUE))
 }

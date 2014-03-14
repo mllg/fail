@@ -1,5 +1,8 @@
 # fail
 
+* Travis CI: [![Build Status](https://travis-ci.org/mllg/fail.png)](https://travis-ci.org/mllg/fail)
+
+
 File Abstraction Interface Layer (FAIL) for R, mimicking a key-value store.
 
 This package simplifies working with RData files managed in directories.

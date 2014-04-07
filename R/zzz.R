@@ -1,3 +1,4 @@
+#' @import checkmate
 #' @importFrom BBmisc stopf
 #' @importFrom BBmisc warningf
 #' @importFrom BBmisc collapse

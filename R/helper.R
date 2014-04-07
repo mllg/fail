@@ -20,18 +20,6 @@ asFlag = function(x, default, na.ok = FALSE) {
   return(x1)
 }
 
-assertString = function(x, na.ok = FALSE) {
-  if (missing(x))
-    stopf("Argument '%s' is missing", deparse(substitute(x)))
-  if (!is.character(x))
-    stopf("Argument '%s' must be of type character", deparse(substitute(x)))
-  if (length(x) != 1L)
-    stopf("Argument '%s' must have length 1", deparse(substitute(x)))
-  if (!na.ok && is.na(x))
-    stopf("Arguments '%s' is NA", deparse(substitute(x)))
-  invisible(TRUE)
-}
-
 asKeys = function(keys, len, default) {
   if (missing(keys)) {
     if (!missing(default))

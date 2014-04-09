@@ -5,7 +5,6 @@
 #' @importFrom BBmisc %nin%
 #' @importFrom BBmisc is.error
 #' @importFrom BBmisc setClasses
-#' @importFrom BBmisc isDirectory
 #' @importFrom BBmisc names2
 #' @importFrom BBmisc argsAsNamedList
 #' @importFrom BBmisc vlapply

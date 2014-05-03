@@ -4,20 +4,7 @@ asFlag = function(x, default, na.ok = FALSE) {
       return(default)
     stopf("Argument %s is missing", deparse(substitute(x)))
   }
-
-  if (length(x) != 1L)
-    stopf("Argument %s must have length 1", deparse(substitute(x)))
-
-  if (is.logical(x)) {
-    if (!na.ok && is.na(x))
-      stopf("Argument %s may not be NA", deparse(substitute(x)))
-    return(x)
-  }
-
-  x1 = try(as.logical(x), silent = TRUE)
-  if (is.error(x1) || length(x1) != 1L || (!na.ok && is.na(x1)))
-    stopf("Argument %s is not convertible to a logical value", deparse(substitute(x)))
-  return(x1)
+  pass(x, "flag", na.ok = na.ok, .var.name = deparse(substitute(x)))
 }
 
 asKeys = function(keys, len, default) {
@@ -33,43 +20,30 @@ asKeys = function(keys, len, default) {
       stop("Keys must be of type character or be convertible to character")
   }
 
-  if (!missing(len)) {
-    if (length(keys) != len)
+  if (!missing(len) && length(keys) != len)
       stop("Keys must have length ", len)
-  }
-
-  if (any(is.na(keys)))
+  if (anyMissing(keys))
     stop("Keys contain NAs")
 
   # R variable pattern: "^((\\.[[:alpha:]._]+)|([[:alpha:]]+))[[:alnum:]_.]*$"
   pattern = "^[[:alnum:]._-]+$"
   ok = grepl(pattern, keys)
-  if (! all(ok))
+  if (!all(ok))
     stopf("Key '%s' in illegal format, see help", head(keys[!ok], 1L))
 
   return(keys)
 }
 
 checkPath = function(path) {
-  assertString(path)
-  if (file.exists(path)) {
-    if (!isDirectory(path))
-      stopf("Path '%s' is present but not a directory", path)
-    if (.Platform$OS.type != "windows") {
-      if (file.access(path, mode = 4L) != 0L)
-        stopf("Path '%s' is not readable", path)
-      if (file.access(path, mode = 2L) != 0L)
-        stopf("Path '%s' is not writeable", path)
-    }
-  } else {
-    if (!dir.create(path))
-      stopf("Could not create directory '%s'", path)
-  }
-  return(path)
+  qassert(path, "S1")
+  if (!file.exists(path) && !dir.create(path, recursive = TRUE))
+    stopf("Could not create directory '%s'", path)
+
+  pass(path, "directory", access = "r")
 }
 
 checkExtension = function(extension) {
-  assertString(extension)
+  qassert(extension, "S1")
   if (grepl("[^[:alnum:]]", extension))
     stop("Extension contains illegal characters: ",
          collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))

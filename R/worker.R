@@ -25,7 +25,7 @@ Put = function(.self, ..., keys, li, use.cache) {
   keys = c(asKeys(keys, len = length(args)), asKeys(names2(li)))
   args = c(args, as.list(li))
 
-  if (any(is.na(keys)))
+  if (anyMissing(keys))
     stop("Could not determine all key names from input")
   if (anyDuplicated(keys))
     stop("Duplicated key names")
@@ -73,9 +73,8 @@ Mapply = function(.self, FUN, ..., keys, use.cache, moreArgs, simplify, use.name
     return(res)
   }
 
-  FUN = match.fun(FUN)
-  if (!all(c("key", "value") %in% names(formals(FUN))))
-    stop("Function must have formal arguments 'key' and 'value'")
+  force(FUN)
+  assert(FUN, "function", args = c("key", "value"))
 
   return(mapply(wrapper, .key = keys, ..., MoreArgs = moreArgs, USE.NAMES = use.names, SIMPLIFY = simplify))
 }

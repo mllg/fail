@@ -21,14 +21,14 @@
 #'   for details.
 #' @export
 sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE) {
-  .self = list(path = checkPath(path),
-               extension = checkExtension(extension),
-               use.cache = asFlag(use.cache),
-               simplify = asFlag(simplify, na.ok = TRUE),
-               cache = Cache(),
-               loadFun = loadR,
-               saveFun = saveR
-               )
+  .self = list(
+    path = checkPath(path),
+    extension = checkExtension(extension),
+    use.cache = asFlag(use.cache),
+    simplify = asFlag(simplify, na.ok = TRUE),
+    cache = Cache(),
+    loadFun = loadR,
+    saveFun = saveR)
   checkCollision(Ls(.self))
   setClasses(makeObject(.self), "sail")
 }

@@ -11,26 +11,22 @@ printObject = function(x, type) {
       sep = "\n")
 }
 
-#' @method print fail
-#' @S3method print fail
+#' @export
 print.fail = function(x, ...) {
   printObject(x, "File Abstraction Interface Layer")
 }
 
-#' @method print sail
-#' @S3method print sail
+#' @export
 print.sail = function(x, ...) {
   printObject(x, "Source Abstraction Interface Layer")
 }
 
-#' @method as.list fail
-#' @S3method as.list fail
+#' @export
 as.list.fail = function(x, ...) {
   x$as.list(...)
 }
 
-#' @method as.list sail
-#' @S3method as.list sail
+#' @export
 as.list.sail = function(x, ...) {
   x$as.list(...)
 }

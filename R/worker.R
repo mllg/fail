@@ -72,10 +72,7 @@ Mapply = function(.self, FUN, ..., keys, use.cache, moreArgs, simplify, use.name
       stopf("Error applying function on key '%s': %s", .key, as.character(res))
     return(res)
   }
-
-  force(FUN)
-  assert(FUN, "function", args = c("key", "value"))
-
+  assertFunction(FUN, args = c("key", "value"))
   return(mapply(wrapper, .key = keys, ..., MoreArgs = moreArgs, USE.NAMES = use.names, SIMPLIFY = simplify))
 }
 

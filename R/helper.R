@@ -4,7 +4,8 @@ asFlag = function(x, default, na.ok = FALSE) {
       return(default)
     stopf("Argument %s is missing", deparse(substitute(x)))
   }
-  pass(x, "flag", na.ok = na.ok, .var.name = deparse(substitute(x)))
+  assertFlag(x, na.ok = na.ok, .var.name = deparse(substitute(x)))
+  x
 }
 
 asKeys = function(keys, len, default) {
@@ -38,8 +39,8 @@ checkPath = function(path) {
   qassert(path, "S1")
   if (!file.exists(path) && !dir.create(path, recursive = TRUE))
     stopf("Could not create directory '%s'", path)
-
-  pass(path, "directory", access = "r")
+  assertDirectory(path, access = "r")
+  path
 }
 
 checkExtension = function(extension) {

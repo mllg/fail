@@ -1,5 +1,7 @@
 ## Version 1.3 (xxxx-xx-xx)
 * New closure "$pos" to get the n-th key
+* Added argument suppressMessages to sail
+* sail now sources files in their respective directory
 
 ## Version 1.2 (2013-09-18)
 * New argument "simplify" to enforce lists to be returned

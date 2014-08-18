@@ -17,6 +17,10 @@
 #'   If only one object is defined in a sourced R file,
 #'   should the return value be simplified? If set to \code{TRUE},
 #'   instead of a list containing one element the object itself will be returned.
+#' @param suppressMessages [\code{logical(1)}]\cr
+#'   Wrap the \code{\link[base]{sys.source}} command into \code{\link[base]{suppressMessages}}
+#'   and \code{link[base]{suppressPackageStartupMessages}}?
+#'   Default is \code{FALSE}, i.e. you will see regular output of sourced scripts.
 #' @return Object of class \code{sail}. See the documentation of \code{\link{fail}}
 #'   for details.
 #' @export

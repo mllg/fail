@@ -15,7 +15,7 @@ saveRData = function(fn, key, value) {
 
 loadR = function(fn, simplify = FALSE) {
   ee = new.env(parent = .GlobalEnv, hash = FALSE)
-  sys.source(fn, ee)
+  sys.source(fn, ee, chdir = TRUE)
   ns = ls(ee, all.names = TRUE)
   if (simplify && length(ns) == 1L)
     return(ee[[ns]])

@@ -142,14 +142,15 @@
 #' mean(y)
 fail = function(path = getwd(), extension = "RData", use.cache = FALSE, simplify = TRUE) {
   ### argument checks
-  .self = list(path = checkPath(path),
-               extension = checkExtension(extension),
-               use.cache = asFlag(use.cache),
-               simplify = asFlag(simplify, na.ok = TRUE),
-               cache = Cache(),
-               loadFun = loadRData,
-               saveFun = saveRData
-               )
+  .self = list(
+    path = checkPath(path),
+    extension = checkExtension(extension),
+    use.cache = asFlag(use.cache),
+    simplify = asFlag(simplify, na.ok = TRUE),
+    cache = Cache(),
+    loadFun = loadRData,
+    saveFun = saveRData
+  )
   checkCollision(Ls(.self))
   setClasses(makeObject(.self), "fail")
 }

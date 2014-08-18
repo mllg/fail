@@ -47,7 +47,7 @@ checkExtension = function(extension) {
   qassert(extension, "S1")
   if (grepl("[^[:alnum:]]", extension))
     stop("Extension contains illegal characters: ",
-         collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
+      collapse(strsplit(gsub("[[:alnum:]]", "", extension), ""), " "))
   return(extension)
 }
 
@@ -55,7 +55,7 @@ checkCollision = function(keys) {
   dups = duplicated(tolower(keys))
   if (any(dups)) {
     warningf("The following keys result in colliding files on case insensitive file systems: %s",
-             collapse(keys[dups]))
+      collapse(keys[dups]))
   }
   invisible(TRUE)
 }
@@ -76,5 +76,5 @@ key2fn = function(.self, key) {
 }
 
 nkeys = function(.self) {
-  length(list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case=TRUE))
+  length(list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case = TRUE))
 }

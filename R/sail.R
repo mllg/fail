@@ -20,7 +20,8 @@
 #' @return Object of class \code{sail}. See the documentation of \code{\link{fail}}
 #'   for details.
 #' @export
-sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE) {
+sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE,
+  suppressMessages = FALSE) {
   .self = list(
     path = checkPath(path),
     extension = checkExtension(extension),
@@ -28,7 +29,9 @@ sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = T
     simplify = asFlag(simplify, na.ok = TRUE),
     cache = Cache(),
     loadFun = loadR,
-    saveFun = saveR)
+    saveFun = saveR,
+    suppressMessages = asFlag(suppressMessages)
+  )
   checkCollision(Ls(.self))
   setClasses(makeObject(.self), "sail")
 }

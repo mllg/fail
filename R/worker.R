@@ -12,10 +12,10 @@ Get = function(.self, key, use.cache) {
 
   if (use.cache) {
     if (!.self$cache$exists(key))
-      .self$cache$put(key, .self$loadFun(fn, .self$simplify))
+      .self$cache$put(key, .self$loadFun(.self, fn))
     return(.self$cache$get(key))
   }
-  return(.self$loadFun(fn, .self$simplify))
+  return(.self$loadFun(.self, fn))
 }
 
 Put = function(.self, ..., keys, li, use.cache) {
@@ -33,11 +33,13 @@ Put = function(.self, ..., keys, li, use.cache) {
   checkCollisionNew(keys, Ls(.self))
 
   if (use.cache)
-    mapply(.self$cache$put, key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    mapply(.self$cache$put, key = keys, value = args,
+      USE.NAMES = FALSE, SIMPLIFY = FALSE)
   else
     .self$cache$rm(keys)
 
-  mapply(.self$saveFun, fn = key2fn(.self, keys), key = keys, value = args, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+  mapply(.self$saveFun, fn = key2fn(.self, keys), key = keys, value = args,
+    MoreArgs = list(.self = .self), USE.NAMES = FALSE, SIMPLIFY = FALSE)
   invisible(keys)
 }
 

@@ -3,3 +3,4 @@ todo
 .gitignore
 README.md
 .travis.yml
+^.editorconfig$

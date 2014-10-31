@@ -1,8 +1,8 @@
 Package: fail
 Type: Package
-Title: File Abstraction Interface Layer (FAIL) mimicking a key-value store
-Description: More comfortable interface to work with a directory of R data or
-    source files
+Title: File Abstraction Interface Layer (FAIL)
+Description: More comfortable interface to work with R data or source files
+    in a key-value fashion.
 Version: 1.3
 Author: Michel Lang <michellang@gmail.com>
 Maintainer: Michel Lang <michellang@gmail.com>

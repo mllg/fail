@@ -9,6 +9,8 @@ Maintainer: Michel Lang <michellang@gmail.com>
 URL: https://github.com/mllg/fail
 License: BSD_3_clause + file LICENSE
 Imports:
+    stats,
+    utils,
     BBmisc,
     checkmate
 Suggests:

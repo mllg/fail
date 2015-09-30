@@ -1,4 +1,7 @@
 #' @import checkmate
+#' @importFrom stats setNames
+#' @importFrom utils head
+#' @importFrom utils methods
 #' @importFrom BBmisc stopf
 #' @importFrom BBmisc warningf
 #' @importFrom BBmisc collapse

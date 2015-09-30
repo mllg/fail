@@ -1,5 +1,8 @@
 # fail
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fail)](http://cran.r-project.org/package=fail)
+[![Build Status](https://travis-ci.org/mllg/fail.png)](https://travis-ci.org/mllg/fail)
+[![Build status](https://ci.appveyor.com/api/projects/status/sc81p69po2w9k32m?svg=true)](https://ci.appveyor.com/project/mllg/fail)
 
 File Abstraction Interface Layer (FAIL) for R, mimicking a key-value store.
 
@@ -169,4 +172,3 @@ results$clear()
 results$cached()
 ```
 
-Travis CI: [![Build Status](https://travis-ci.org/mllg/fail.png)](https://travis-ci.org/mllg/fail)

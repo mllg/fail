@@ -1,5 +1,5 @@
 Ls = function(.self, pattern = NULL) {
-  keys = fn2key(.self, list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case=TRUE))
+  keys = fn2key(.self, list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case = TRUE, all.files = .self$all.files))
   if (!is.null(pattern))
     keys = keys[grepl(pattern, keys)]
   return(keys)
@@ -22,7 +22,7 @@ Put = function(.self, ..., keys, li, use.cache) {
   args = argsAsNamedList(...)
   if (missing(keys))
     keys = names2(args)
-  keys = c(asKeys(keys, len = length(args)), asKeys(names2(li)))
+  keys = c(asKeys(.self, keys, len = length(args)), asKeys(.self, names2(li)))
   args = c(args, as.list(li))
 
   if (anyMissing(keys))

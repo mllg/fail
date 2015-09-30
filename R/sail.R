@@ -9,6 +9,9 @@
 #' @param extension [\code{character(1)}]\cr
 #'   File extension to work with.
 #'   Default is \dQuote{R}.
+#' @param all.files [\code{logical(1)}]\cr
+#'   Also include hidden files, i.e. files whose name start with a dot (\dQuote{.}).
+#'   Default is \code{FALSE}.
 #' @param use.cache [\code{logical(1)}]\cr
 #'   Use a memory cache per global default.
 #'   Global option which can locally be overwritten in most functions.
@@ -24,11 +27,12 @@
 #' @return Object of class \code{sail}. See the documentation of \code{\link{fail}}
 #'   for details.
 #' @export
-sail = function(path = getwd(), extension = "R", use.cache = FALSE, simplify = TRUE,
+sail = function(path = getwd(), extension = "R", all.files = FALSE, use.cache = FALSE, simplify = TRUE,
   suppressMessages = FALSE) {
   .self = list(
     path = checkPath(path),
     extension = checkExtension(extension),
+    all.files = asFlag(all.files),
     use.cache = asFlag(use.cache),
     simplify = asFlag(simplify, na.ok = TRUE),
     cache = Cache(),

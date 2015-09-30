@@ -12,6 +12,9 @@
 #' @param extension [\code{character(1)}]\cr
 #'   File extension to work with.
 #'   Default is \dQuote{RData}.
+#' @param all.files [\code{logical(1)}]\cr
+#'   Also include hidden files, i.e. files whose name start with a dot (\dQuote{.}).
+#'   Default is \code{FALSE}.
 #' @param use.cache [\code{logical(1)}]\cr
 #'   Use a memory cache per global default.
 #'   Global option which can locally be overwritten in most functions.
@@ -140,11 +143,12 @@
 #' # assign variables in the current environment
 #' files$assign("y")
 #' mean(y)
-fail = function(path = getwd(), extension = "RData", use.cache = FALSE, simplify = TRUE) {
+fail = function(path = getwd(), extension = "RData", all.files = FALSE, use.cache = FALSE, simplify = TRUE) {
   ### argument checks
   .self = list(
     path = checkPath(path),
     extension = checkExtension(extension),
+    all.files = asFlag(all.files),
     use.cache = asFlag(use.cache),
     simplify = asFlag(simplify, na.ok = TRUE),
     cache = Cache(),

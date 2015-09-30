@@ -5,7 +5,7 @@ makeObject = function(.self) {
       Ls(.self, pattern)
     },
     get = function(key, simplify, use.cache) {
-      Get(.self, asKeys(key, len = 1L),
+      Get(.self, asKeys(.self, key, len = 1L),
         use.cache = asFlag(use.cache, default = .self$use.cache))
     },
     pos = function(n = 1L, use.cache) {
@@ -19,32 +19,32 @@ makeObject = function(.self) {
         use.cache = asFlag(use.cache, default = .self$use.cache))
     },
     remove = function(keys) {
-      Remove(.self, asKeys(keys))
+      Remove(.self, asKeys(.self, keys))
     },
     as.list = function(keys, use.cache) {
-      AsList(.self, asKeys(keys, default = Ls(.self)),
+      AsList(.self, asKeys(.self, keys, default = Ls(.self)),
         use.cache = asFlag(use.cache, default = .self$use.cache))
     },
     apply = function(FUN, ..., keys, use.cache, simplify = FALSE, use.names = TRUE) {
-      Apply(.self, FUN, ..., keys = asKeys(keys, default = Ls(.self)),
+      Apply(.self, FUN, ..., keys = asKeys(.self, keys, default = Ls(.self)),
         use.cache = asFlag(use.cache, default = .self$use.cache),
         simplify = asFlag(simplify), use.names = asFlag(use.names))
     },
     mapply = function(FUN, ..., keys, use.cache, moreArgs = NULL, simplify = FALSE, use.names = TRUE) {
-      Mapply(.self, FUN, ..., keys = asKeys(keys, default = Ls(.self)),
+      Mapply(.self, FUN, ..., keys = asKeys(.self, keys, default = Ls(.self)),
         use.cache = asFlag(use.cache, default = .self$use.cache),
         moreArgs = as.list(moreArgs), simplify = asFlag(simplify), use.names = asFlag(use.names))
     },
     assign = function(keys, envir = parent.frame(), use.cache) {
-      Assign(.self, keys = asKeys(keys, default = Ls(.self)), envir = as.environment(envir),
+      Assign(.self, keys = asKeys(.self, keys, default = Ls(.self)), envir = as.environment(envir),
         use.cache = asFlag(use.cache, default = .self$use.cache))
     },
     size = function(keys, unit = "b") {
       match.arg(unit, choices = names(UNITCONVERT))
-      Size(.self, asKeys(keys, default = Ls(.self)), unit = unit)
+      Size(.self, asKeys(.self, keys, default = Ls(.self)), unit = unit)
     },
     clear = function(keys) {
-      Clear(.self, asKeys(keys, default = Ls(.self)))
+      Clear(.self, asKeys(.self, keys, default = Ls(.self)))
     },
     cached = function() {
       Cached(.self)

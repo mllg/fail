@@ -14,3 +14,13 @@ test_that("Constructor checks input", {
   expect_error(fail(path, extension="^"))
   expect_error(fail(path, extension=".RData"))
 })
+
+test_that("Argument 'all.files' works", {
+  path = tempfile()
+  f = fail(path, all.files = FALSE)
+  expect_error(f$put(.x = 1), "hidden")
+
+  f = fail(path, all.files = TRUE)
+  f$put(.x = 1)
+  expect_equal(f$ls(), ".x")
+})

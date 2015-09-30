@@ -1,4 +1,5 @@
 ## Version 1.3 (xxxx-xx-xx)
+* New argument "all.files" to allow working with hidden files
 * New closure "$pos" to get the n-th key
 * Added argument suppressMessages to sail
 * sail now sources files in their respective directory

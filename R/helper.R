@@ -8,7 +8,7 @@ asFlag = function(x, default, na.ok = FALSE) {
   x
 }
 
-asKeys = function(keys, len, default) {
+asKeys = function(.self, keys, len, default) {
   if (missing(keys)) {
     if (!missing(default))
       return(default)
@@ -31,6 +31,8 @@ asKeys = function(keys, len, default) {
   ok = grepl(pattern, keys)
   if (!all(ok))
     stopf("Key '%s' in illegal format, see help", head(keys[!ok], 1L))
+  if (!.self$all.files && any(substr(keys, 1L, 1L) == "."))
+    stop("Cannot work with hidden files (files starting with a dot) if 'all.files' is set to TRUE.")
 
   return(keys)
 }
@@ -76,5 +78,5 @@ key2fn = function(.self, key) {
 }
 
 nkeys = function(.self) {
-  length(list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case = TRUE))
+  length(list.files(.self$path, pattern = sprintf("\\.%s$", .self$extension), ignore.case = TRUE, all.files = .self$all.files))
 }

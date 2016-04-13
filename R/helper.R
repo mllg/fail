@@ -32,7 +32,7 @@ asKeys = function(.self, keys, len, default) {
   if (!all(ok))
     stopf("Key '%s' in illegal format, see help", head(keys[!ok], 1L))
   if (!.self$all.files && any(substr(keys, 1L, 1L) == "."))
-    stop("Cannot work with hidden files (files starting with a dot) if 'all.files' is set to TRUE.")
+    stop("Cannot work with hidden files (files starting with a dot) if 'all.files' is set to FALSE.")
 
   return(keys)
 }

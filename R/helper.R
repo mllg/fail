@@ -41,7 +41,7 @@ checkPath = function(path) {
   qassert(path, "S1")
   if (!file.exists(path) && !dir.create(path, recursive = TRUE))
     stopf("Could not create directory '%s'", path)
-  assertDirectory(path, access = "r")
+  assertDirectoryExists(path, access = "r")
   path
 }
 
